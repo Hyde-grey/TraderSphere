@@ -1,0 +1,35 @@
+.navigation {
+  border-left: 1rem solid #00fff2;
+  border-right: 1rem solid #00fff2;
+
+  display: flex;
+  justify-content: space-evenly;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #222628;
+  position: relative;
+}
+
+.navigationItem {
+  height: 100%;
+
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff00;
+  border-left: 1rem solid #00000033;
+  padding: 0.5rem;
+}
+
+.active p {
+  color: #00fff2;
+}
+
+.active {
+  border-left: 1rem solid #00fff2;
+}
+
+.navigationItem:hover h2 {
+  color: #ffffff;
+}
