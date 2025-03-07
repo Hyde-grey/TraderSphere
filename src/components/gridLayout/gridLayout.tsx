@@ -3,11 +3,7 @@ import { motion } from "framer-motion";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styles from "./gridLayout.module.css";
-import { useEffect } from "react";
-import { useState } from "react";
-import { useFetchData } from "../hooks/useFetchData";
-import { useConnectToBinanceWebSocket } from "../hooks/useLiveData";
-// Wrap GridLayout with WidthProvider
+
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
 const layout = [

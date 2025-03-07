@@ -11,8 +11,6 @@ export const useFetchData = (
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       const baseUrl = `https://api.binance.com/api/v3`;
-
-      // Build the complete URL with query parameters
       const url = new URL(`${baseUrl}/${endpoint}`);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
