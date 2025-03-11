@@ -26,10 +26,12 @@ const columns: ColumnDef<MarketData>[] = [
     header: "Symbols",
     accessorKey: "symbol",
     cell: ({ row }) => <span>{row.original.symbol}</span>,
+    filterFn: "includesString",
   },
   {
     header: "Price",
     accessorKey: "lastPrice",
+    filterFn: "includesString",
     cell: ({ row }) => (
       <span>
         $
@@ -42,6 +44,7 @@ const columns: ColumnDef<MarketData>[] = [
   {
     header: "24h Change",
     accessorKey: "priceChangePercent",
+    filterFn: "inNumberRange",
     cell: ({ row }) => {
       const value = parseFloat(row.original.priceChangePercent);
       const isPositive = value >= 0;
@@ -56,6 +59,7 @@ const columns: ColumnDef<MarketData>[] = [
   {
     header: "Volume",
     accessorKey: "volume",
+    filterFn: "includesString",
     cell: ({ row }) => {
       const volume = parseFloat(row.original.volume);
       return <span>{volume.toLocaleString("en-US")}</span>;
@@ -122,6 +126,18 @@ const MarketSummaryTable = () => {
                     header.column.columnDef.header,
                     header.getContext()
                   )}
+                  {header.column.getCanFilter() && (
+                    <div className={styles.columnFilter}>
+                      <input
+                        value={(header.column.getFilterValue() as string) ?? ""}
+                        onChange={(e) =>
+                          header.column.setFilterValue(e.target.value)
+                        }
+                        placeholder={`Filter ${header.column.id}...`}
+                        className={styles.columnFilterInput}
+                      />
+                    </div>
+                  )}
                 </th>
               ))}
             </tr>
@@ -177,7 +193,7 @@ const MarketSummaryTable = () => {
         >
           {[5, 10, 20, 50].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
-              Show {pageSize}
+              <span>Show {pageSize}</span>
             </option>
           ))}
         </select>
