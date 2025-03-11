@@ -3,12 +3,13 @@ import { motion } from "framer-motion";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styles from "./gridLayout.module.css";
+import MarketSummaryTable from "../widgets/marketSummaryTable";
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
 const layout = [
-  { i: "widget1", x: 0, y: 0, w: 3, h: 5, minH: 3, minW: 3, maxH: 9 },
-  { i: "widget2", x: 3, y: 0, w: 9, h: 5, minH: 3, minW: 3, maxH: 9 },
+  { i: "widget1", x: 0, y: 0, w: 4, h: 5, minH: 3, minW: 3, maxH: 9 },
+  { i: "widget2", x: 4, y: 0, w: 8, h: 5, minH: 3, minW: 3, maxH: 9 },
   { i: "widget3", x: 0, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
   { i: "widget4", x: 6, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
 ];
@@ -44,6 +45,9 @@ const DashboardLayout = () => {
                 style={{ cursor: "move" }}
               >
                 <h2>Market Overview</h2>
+              </div>
+              <div className={styles.widgetContent}>
+                <MarketSummaryTable />
               </div>
             </div>
           </motion.div>
