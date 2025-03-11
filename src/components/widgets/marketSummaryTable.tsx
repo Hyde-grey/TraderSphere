@@ -13,7 +13,7 @@ import { useState } from "react";
 
 type MarketData = {
   symbol: string;
-  bidPrice: string;
+  lastPrice: string;
   priceChangePercent: string;
   volume: string;
 };
@@ -26,11 +26,11 @@ const columns: ColumnDef<MarketData>[] = [
   },
   {
     header: "Price",
-    accessorKey: "bidPrice",
+    accessorKey: "lastPrice",
     cell: ({ row }) => (
       <span>
         $
-        {parseFloat(row.original.bidPrice).toLocaleString("en-US", {
+        {parseFloat(row.original.lastPrice).toLocaleString("en-US", {
           minimumFractionDigits: 2,
         })}
       </span>
