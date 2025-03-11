@@ -6,6 +6,9 @@ import {
   getPaginationRowModel,
   PaginationState,
   useReactTable,
+  FilterFn,
+  ColumnFiltersState,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 
 import styles from "./widgets.module.css";
@@ -65,6 +68,9 @@ const MarketSummaryTable = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const { data, loading, error } = useFetchData("ticker/24hr");
 
   const table = useReactTable({
@@ -72,19 +78,40 @@ const MarketSummaryTable = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       pagination,
+      globalFilter,
+      columnFilters,
     },
     onPaginationChange: setPagination,
+    onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
   });
 
   if (loading)
-    return <div className={styles.loading}>Loading market data...</div>;
+    return (
+      <div className={styles.loading}>
+        <h2>Loading market data...</h2>
+      </div>
+    );
   if (error)
-    return <div className={styles.error}>Error loading market data</div>;
+    return (
+      <div className={styles.error}>
+        <h2>Error loading market data</h2>
+      </div>
+    );
 
   return (
     <div className={styles.tableContainer}>
+      <div className={styles.tableSearch}>
+        <input
+          value={globalFilter ?? ""}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search all columns..."
+          className={styles.searchInput}
+        />
+      </div>
       <table className={styles.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -114,7 +141,7 @@ const MarketSummaryTable = () => {
           ) : (
             <tr>
               <td colSpan={columns.length} className={styles.noData}>
-                No data available
+                <span> No data available</span>
               </td>
             </tr>
           )}

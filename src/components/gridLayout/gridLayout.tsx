@@ -8,10 +8,10 @@ import MarketSummaryTable from "../widgets/marketSummaryTable";
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
 const layout = [
-  { i: "widget1", x: 0, y: 0, w: 4, h: 5, minH: 3, minW: 3, maxH: 9 },
-  { i: "widget2", x: 4, y: 0, w: 8, h: 5, minH: 3, minW: 3, maxH: 9 },
+  { i: "widget1", x: 0, y: 0, w: 4, h: 5.5, minH: 3, minW: 3, maxH: 9 },
+  { i: "widget2", x: 4, y: 0, w: 8, h: 5.5, minH: 3, minW: 3, maxH: 9 },
   { i: "widget3", x: 0, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
-  { i: "widget4", x: 6, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
+  { i: "widget4", x: 6, y: 4, w: 6, h: 4.5, minH: 3, minW: 3 },
 ];
 
 const DashboardLayout = () => {
