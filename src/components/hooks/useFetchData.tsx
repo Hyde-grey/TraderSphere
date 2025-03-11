@@ -9,6 +9,7 @@ export const useFetchData = (
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    console.log(endpoint);
     const fetchDataFromAPI = async () => {
       const baseUrl = `https://api.binance.com/api/v3`;
       const url = new URL(`${baseUrl}/${endpoint}`);
