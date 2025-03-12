@@ -1,10 +1,34 @@
 import { useState, useEffect } from "react";
 
+export type StaticMarketData = {
+  symbol: string;
+  priceChange: string;
+  priceChangePercent: string;
+  weightedAvgPrice: string;
+  prevClosePrice: string;
+  lastPrice: string;
+  lastQty: string;
+  bidPrice: string;
+  bidQty: string;
+  askPrice: string;
+  askQty: string;
+  openPrice: string;
+  highPrice: string;
+  lowPrice: string;
+  volume: string;
+  quoteVolume: string;
+  openTime: number;
+  closeTime: number;
+  firstId: number;
+  lastId: number;
+  count: number;
+};
+
 export const useFetchData = (
   endpoint: string,
   params?: Record<string, string>
 ) => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<StaticMarketData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -34,7 +58,7 @@ export const useFetchData = (
             ? error
             : new Error("An unknown error occurred")
         );
-        setData(null);
+        setData([]);
       } finally {
         setLoading(false);
       }
