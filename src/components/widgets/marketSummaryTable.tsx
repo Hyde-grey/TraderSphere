@@ -1,4 +1,3 @@
-import { useFetchData } from "../../components/hooks/useFetchData";
 import {
   ColumnDef,
   flexRender,
@@ -13,6 +12,7 @@ import {
 
 import styles from "./widgets.module.css";
 import { useState } from "react";
+import { useProcessMarketData } from "./useProcessMarketData";
 
 type MarketData = {
   symbol: string;
@@ -75,7 +75,14 @@ const MarketSummaryTable = () => {
 
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const { data, loading, error } = useFetchData("ticker/24hr");
+  // const { data, loading, error } = useFetchData("ticker/24hr");
+  const {
+    marketData: data,
+    loading,
+    error,
+    isConnected,
+    liveError,
+  } = useProcessMarketData();
 
   const table = useReactTable({
     data: data || [],
@@ -83,11 +90,14 @@ const MarketSummaryTable = () => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    autoResetPageIndex: false,
+    getRowId: (row) => row.symbol,
     state: {
       pagination,
       globalFilter,
       columnFilters,
     },
+
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
@@ -193,7 +203,7 @@ const MarketSummaryTable = () => {
         >
           {[5, 10, 20, 50].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
-              <span>Show {pageSize}</span>
+              Show {pageSize}
             </option>
           ))}
         </select>
