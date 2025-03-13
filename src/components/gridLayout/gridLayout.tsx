@@ -104,7 +104,7 @@ const DashboardLayout = () => {
         </ResponsiveGridLayout>
       </motion.div>
       <h1 className={styles.futuristicText}>
-        Trade<span>Sphere</span>
+        Trader<span>Sphere</span>
       </h1>
     </>
   );
