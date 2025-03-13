@@ -82,7 +82,7 @@ The modular, resizable layout allows traders to tailor their experience based on
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/traderSphere.git
+git clone https://github.com/Hyde-grey/TraderSphere.git
 
 # Install dependencies
 cd traderSphere
