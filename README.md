@@ -1,54 +1,103 @@
-# React + TypeScript + Vite
+# TraderSphere: Modern Trading Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TraderSphere is a sophisticated trading dashboard built with React, TypeScript, and Vite that demonstrates advanced frontend techniques for handling real-time financial data. This project showcases my ability to work with REST and WebSocket APIs while creating a responsive, high-performance user interface.
 
-Currently, two official plugins are available:
+![TraderSphere Dashboard]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<a href="https://ibb.co/N6hL09fG"><img src="https://i.ibb.co/vx5JN3fM/trader-Sphere-beta-screenshot.png" alt="trader-Sphere-beta-screenshot" border="0"></a>
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Real-time Market Data Integration
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **REST API Integration**: Fetches initial market data with optimized loading states and error handling
+- **WebSocket Live Updates**: Implements real-time data streaming for instant price updates
+- **Debounced Updates**: Optimizes rendering performance with intelligent update batching
+
+### Advanced Data Visualization
+
+- **Virtualized Data Tables**: Supports thousands of rows with minimal performance impact
+- **Interactive Filtering**: Multi-level filtering capabilities (global and per-column)
+- **Responsive Pagination**: Configurable page sizes with smooth navigation
+
+### Futuristic Design
+
+- **Dark Mode Interface**: Sleek, professional design optimized for trader focus
+- **High Contrast Elements**: Color-coded indicators for positive/negative values
+- **Clean Typography**: Optimized for readability during extended sessions
+
+### Modular, Resizable Layout
+
+- **Customizable Dashboard**: Drag-and-drop widget positioning
+- **Resizable Components**: Adjust widget sizes to prioritize important information
+- **Layout Persistence**: Saves user preferences for consistent experience
+
+## Project Purpose
+
+TraderSphere is a trader dashboard tool that allows users to display detailed information about various financial metrics and market data. It's designed to help traders:
+
+1. Monitor real-time market movements across multiple assets
+2. Analyze historical and current price data
+3. Make informed decisions on buying and selling positions
+4. Customize their workspace for optimal productivity
+
+The modular, resizable layout allows traders to tailor their experience based on their specific needs and trading style. Whether focusing on a few key assets or monitoring broader market trends, the interface adapts to the user's requirements.
+
+## Technical Implementation
+
+### Frontend Architecture
+
+- **React + TypeScript**: Type-safe component development
+- **Vite**: Lightning-fast development server and optimized builds
+- **Tanstack Query**: Sophisticated data fetching and caching
+- **Tanstack Table**: High-performance table with virtualization
+- **React Grid Layout**: Drag-and-drop resizable widgets
+
+### Data Integration
+
+- **WebSocket Connection**: Live data streaming with reconnection handling
+- **REST API Fetching**: Optimized data loading with proper error states
+- **Data Processing**: Intelligent merging of static and real-time data
+
+### Testing
+
+- **Vitest**: Modern, fast testing framework
+- **React Testing Library**: Component testing with user-centric approach
+- **Mock Service Worker**: API mocking for reliable tests
+
+## Current Progress
+
+- ✅ Core dashboard layout and styling
+- ✅ Market summary table with virtualization
+- ✅ Real-time data integration via WebSockets
+- ✅ Data filtering and pagination
+- ✅ Testing framework setup with Vitest
+- ✅ Modular widget system
+- 🔄 Customizable chart widgets (in progress)
+- 🔄 User settings and preferences (in progress)
+- ⬜ Advanced technical indicators
+- ⬜ Portfolio tracking features
+
+## Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/traderSphere.git
+
+# Install dependencies
+cd traderSphere
+yarn install
+
+# Start development server
+yarn dev
+
+# Run tests
+yarn test
+
+# Build for production
+yarn build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## License
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+[MIT](LICENSE)
