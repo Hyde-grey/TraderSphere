@@ -9,9 +9,10 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 import styles from "./widgets.module.css";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useProcessMarketData } from "./useProcessMarketData";
 
 type MarketData = {
@@ -70,7 +71,7 @@ const columns: ColumnDef<MarketData>[] = [
 const MarketSummaryTable = () => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   });
 
   const [globalFilter, setGlobalFilter] = useState("");
@@ -83,6 +84,33 @@ const MarketSummaryTable = () => {
     isConnected,
     liveError,
   } = useProcessMarketData();
+
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+  const [tableHeight, setTableHeight] = useState<number>(0);
+
+  // Setup resize observer to handle dynamic container height
+  useEffect(() => {
+    if (!tableContainerRef.current) return;
+
+    // Get initial height
+    setTableHeight(tableContainerRef.current.clientHeight);
+
+    // Setup resize observer
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        const height = entry.contentRect.height;
+        setTableHeight(height);
+      }
+    });
+
+    resizeObserver.observe(tableContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const table = useReactTable({
     data: data || [],
@@ -102,6 +130,36 @@ const MarketSummaryTable = () => {
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
   });
+
+  // Define a fixed row height constant
+  const ROW_HEIGHT = 45; // pixels
+
+  // Setup virtualizer with fixed row height
+  const { rows } = table.getRowModel();
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => ROW_HEIGHT, // Use the fixed row height constant
+    overscan: 10, // number of items to render outside of the visible area
+    scrollMargin: tableHeight,
+  });
+
+  // Get virtualized rows
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? totalSize -
+        (virtualRows[virtualRows.length - 1].start +
+          virtualRows[virtualRows.length - 1].size)
+      : 0;
+
+  // Calculate if we need a spacer to prevent row stretching
+  const containerHeight = tableHeight || 0;
+  const visibleRowsHeight = virtualRows.length * ROW_HEIGHT;
+  const needsSpacer = containerHeight > visibleRowsHeight && rows.length > 0;
+  const spacerHeight = needsSpacer ? containerHeight - visibleRowsHeight : 0;
 
   if (loading)
     return (
@@ -126,53 +184,98 @@ const MarketSummaryTable = () => {
           className={styles.searchInput}
         />
       </div>
-      <table className={styles.table}>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                  {header.column.getCanFilter() && (
-                    <div className={styles.columnFilter}>
-                      <input
-                        value={(header.column.getFilterValue() as string) ?? ""}
-                        onChange={(e) =>
-                          header.column.setFilterValue(e.target.value)
-                        }
-                        placeholder={`Filter ${header.column.id}...`}
-                        className={styles.columnFilterInput}
-                      />
-                    </div>
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+
+      {/* Virtualized table container with flexible height */}
+      <div ref={tableContainerRef} className={styles.virtualTableContainer}>
+        <table className={styles.table}>
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {header.column.getCanFilter() && (
+                      <div className={styles.columnFilter}>
+                        <input
+                          value={
+                            (header.column.getFilterValue() as string) ?? ""
+                          }
+                          onChange={(e) =>
+                            header.column.setFilterValue(e.target.value)
+                          }
+                          placeholder={`Filter ${header.column.id}...`}
+                          className={styles.columnFilterInput}
+                        />
+                      </div>
+                    )}
+                  </th>
                 ))}
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length} className={styles.noData}>
-                <span> No data available</span>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody>
+            {rows.length > 0 ? (
+              <>
+                {/* Add padding space at the top */}
+                {paddingTop > 0 && (
+                  <tr className={styles.paddingRow}>
+                    <td
+                      style={{ height: `${paddingTop}px` }}
+                      colSpan={columns.length}
+                    />
+                  </tr>
+                )}
+
+                {/* Render only the visible items */}
+                {virtualRows.map((virtualRow) => {
+                  const row = rows[virtualRow.index];
+                  return (
+                    <tr key={row.id} className={styles.dataRow}>
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+
+                {/* Add padding space at the bottom */}
+                {paddingBottom > 0 && (
+                  <tr className={styles.paddingRow}>
+                    <td
+                      style={{ height: `${paddingBottom}px` }}
+                      colSpan={columns.length}
+                    />
+                  </tr>
+                )}
+
+                {/* Add extra spacer when needed to prevent stretching */}
+                {needsSpacer && (
+                  <tr className={`${styles.paddingRow} ${styles.bottomSpacer}`}>
+                    <td
+                      style={{ height: `${spacerHeight}px` }}
+                      colSpan={columns.length}
+                    />
+                  </tr>
+                )}
+              </>
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className={styles.noData}>
+                  <span>No data available</span>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className={styles.pagination}>
         <button
@@ -201,7 +304,7 @@ const MarketSummaryTable = () => {
           onChange={(e) => table.setPageSize(Number(e.target.value))}
           className={styles.pageSizeSelect}
         >
-          {[5, 10, 20, 50].map((pageSize) => (
+          {[10, 20, 50, 100].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
               Show {pageSize}
             </option>

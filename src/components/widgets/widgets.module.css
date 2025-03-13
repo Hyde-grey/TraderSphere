@@ -4,8 +4,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   background-color: rgba(16, 24, 39, 0.8);
   border-radius: 8px;
 }
@@ -30,7 +29,7 @@
 
 .tableContainer th {
   text-align: left;
-  padding: 12px 16px;
+  padding: 12px 16px; /* Restored original padding */
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   background-color: rgba(30, 41, 59, 0.8);
@@ -40,6 +39,11 @@
   cursor: pointer;
   transition: background-color 0.2s;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  height: auto; /* Restore automatic height */
+  white-space: normal; /* Allow text wrapping */
+  overflow: visible; /* Allow content to overflow */
+  text-overflow: clip; /* Don't add ellipsis */
+  vertical-align: middle;
 }
 
 .tableContainer th:hover {
@@ -128,19 +132,115 @@
   margin-top: 8px;
   padding-top: 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
 }
 
 .columnFilterInput {
   width: 100%;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(16, 24, 39, 0.8);
   color: white;
   font-size: 0.75rem;
+  display: block;
+  margin-top: 4px;
 }
 
 .columnFilterInput::placeholder {
   color: rgba(255, 255, 255, 0.4);
   font-size: 0.7rem;
+}
+
+.virtualTableContainer {
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 16px;
+  background-color: rgba(16, 24, 39, 0.8);
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px; /* Minimum height to ensure visibility */
+}
+
+.virtualTableContainer table {
+  width: 100%;
+  border-collapse: separate; /* Changed to separate for absolute positioning to work */
+  border-spacing: 0;
+  table-layout: fixed; /* Enforce fixed width columns */
+  height: auto; /* Don't stretch the table */
+  flex-grow: 0; /* Don't allow the table to grow */
+  flex-shrink: 0; /* Don't allow the table to shrink */
+}
+
+.virtualTableContainer tbody {
+  position: relative;
+}
+
+.virtualTableContainer tbody tr {
+  width: 100%;
+  display: table-row; /* Enforce proper table behavior */
+  height: 45px !important; /* Enforce fixed height for all rows */
+}
+
+/* Specifically target padding rows for virtualization */
+.paddingRow {
+  border: none !important;
+  background: transparent !important;
+  pointer-events: none;
+  height: auto !important; /* Allow padding rows to have variable height */
+}
+
+.paddingRow td {
+  padding: 0 !important;
+  border: none !important;
+  height: inherit;
+}
+
+/* Special class for the bottom spacer to prevent row stretching */
+.bottomSpacer {
+  height: auto !important;
+  flex-grow: 1;
+}
+
+.bottomSpacer td {
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Style actual data rows consistently with fixed height */
+.dataRow {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s;
+  height: 45px !important; /* Fixed row height */
+  min-height: 45px !important; /* Ensure minimum height */
+  max-height: 45px !important; /* Ensure maximum height */
+  box-sizing: border-box;
+  display: table-row !important; /* Override any flex behaviors */
+}
+
+.dataRow td {
+  padding: 0 16px; /* Adjusted padding for vertical centering */
+  height: 45px !important; /* Ensure fixed height */
+  line-height: 45px; /* Match height for better vertical centering */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle; /* Center content vertically */
+  box-sizing: border-box !important;
+}
+
+.dataRow:hover {
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* Remove the previous first-child specific styling that was causing issues */
+.virtualTableContainer tbody tr:first-child {
+  /* Remove the height: 0 !important that was causing problems */
+}
+
+.virtualTableContainer tbody tr:first-child td {
+  /* Remove specific padding/border settings */
 }
