@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useFetchData } from "../hooks/useFetchData";
-import { useLiveData } from "../hooks/useLiveData";
+import { useFetchData } from "../../hooks/useFetchData";
+import { useLiveData } from "../../hooks/useLiveData";
 
 export const useProcessMarketData = () => {
   const { data, loading, error } = useFetchData("ticker/24hr");

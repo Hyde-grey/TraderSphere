@@ -1,7 +1,7 @@
 import { cleanup, renderHook } from "@testing-library/react";
 import { useProcessMarketData } from "./useProcessMarketData";
-import { useFetchData, StaticMarketData } from "../hooks/useFetchData";
-import { useLiveData } from "../hooks/useLiveData";
+import { useFetchData, StaticMarketData } from "../../hooks/useFetchData";
+import { useLiveData } from "../../hooks/useLiveData";
 import {
   afterEach,
   beforeEach,
@@ -12,7 +12,6 @@ import {
   type MockedFunction,
 } from "vitest";
 
-// Mock the hooks that useProcessMarketData depends on
 vi.mock("../hooks/useFetchData");
 vi.mock("../hooks/useLiveData");
 
@@ -23,7 +22,6 @@ describe("useProcessMarketData hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Default mocked return values
     mockFetchData.mockReturnValue({
       data: [],
       loading: false,
@@ -171,7 +169,7 @@ describe("useProcessMarketData hook", () => {
         P: "2.5",
         w: "36000",
         x: "35900",
-        c: "36100", // lastPrice
+        c: "36100",
         Q: "0.5",
         b: "36090",
         B: "2.5",
@@ -180,7 +178,7 @@ describe("useProcessMarketData hook", () => {
         o: "35800",
         h: "36200",
         l: "35700",
-        v: "1200", // volume
+        v: "1200",
         q: "36000000",
         O: 123456000,
         C: 123456999,
@@ -198,7 +196,6 @@ describe("useProcessMarketData hook", () => {
 
     const { result } = renderHook(() => useProcessMarketData());
 
-    // The expected combined data should have BTCUSDT updated with live data
     expect(result.current.marketData).toEqual([
       {
         ...fetchedData[0],
