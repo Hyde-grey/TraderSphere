@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styles from "./gridLayout.module.css";
-import MarketSummaryTable from "../widgets/marketSummaryTable";
+import MarketSummaryTable from "../widgets/marketSummaryTable/marketSummaryTable";
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
