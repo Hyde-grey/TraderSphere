@@ -4,17 +4,27 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styles from "./gridLayout.module.css";
 import MarketSummaryTable from "../widgets/marketSummaryTable/marketSummaryTable";
+import { useScreenSize } from "../hooks/useScreenSize";
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
-const layout = [
-  { i: "widget1", x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 3, maxH: 9 },
-  { i: "widget2", x: 4, y: 0, w: 8, h: 6, minH: 3, minW: 3, maxH: 9 },
-  { i: "widget3", x: 0, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
-  { i: "widget4", x: 6, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
-];
-
 const DashboardLayout = () => {
+  const { isMobile } = useScreenSize();
+
+  const layout = isMobile
+    ? [
+        { i: "widget1", x: 0, y: 0, w: 12, h: 6, minH: 4, minW: 4, maxH: 9 },
+        { i: "widget2", x: 0, y: 6, w: 12, h: 6, minH: 3, minW: 3, maxH: 9 },
+        { i: "widget3", x: 0, y: 12, w: 12, h: 5, minH: 3, minW: 3 },
+        { i: "widget4", x: 0, y: 17, w: 12, h: 5, minH: 3, minW: 3 },
+      ]
+    : [
+        { i: "widget1", x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 3, maxH: 9 },
+        { i: "widget2", x: 4, y: 0, w: 8, h: 6, minH: 3, minW: 3, maxH: 9 },
+        { i: "widget3", x: 0, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
+        { i: "widget4", x: 6, y: 4, w: 6, h: 5, minH: 3, minW: 3 },
+      ];
+
   return (
     <>
       <motion.div
