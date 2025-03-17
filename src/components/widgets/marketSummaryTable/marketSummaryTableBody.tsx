@@ -9,33 +9,49 @@ type MarketSummaryTableBodyProps = {
 };
 
 const ROW_HEIGHT = 45;
-//minor = pass column count and rows
+const OVERSCAN = 20;
+
 const MarketSummaryTableBody = ({
   table,
   containerRef,
 }: MarketSummaryTableBodyProps) => {
   const columnCount = table.getAllColumns().length;
+  const columnWidth = `${100 / columnCount}%`;
 
   const { rows } = table.getRowModel();
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => containerRef.current,
     estimateSize: () => ROW_HEIGHT,
-    overscan: 10,
+    overscan: OVERSCAN,
+    measureElement: (element) => element.getBoundingClientRect().height,
+    initialRect: { width: 0, height: 0 },
   });
 
   const virtualRows = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
 
   return (
-    <tbody>
+    <tbody style={{ height: `${totalSize}px` }}>
       {!!rows.length ? (
         <>
           {virtualRows.map((virtualRow) => {
             const row = rows[virtualRow.index];
             return (
-              <tr key={row.id} className={styles.dataRow}>
+              <tr
+                key={row.id}
+                className={styles.dataRow}
+                style={{
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${virtualRow.start}px)`,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                }}
+              >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
+                  <td key={cell.id} style={{ width: columnWidth }}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
