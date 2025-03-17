@@ -121,3 +121,9 @@ body {
 .virtualTableContainer::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 242, 0.8);
 }
+
+@media only screen and (max-width: 600px) {
+  span {
+    font-size: 1.1rem;
+  }
+}
