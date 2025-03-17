@@ -4,7 +4,8 @@ TraderSphere is a sophisticated trading dashboard built with React, TypeScript, 
 
 ![TraderSphere Dashboard]
 
-<a href="https://ibb.co/N6hL09fG"><img src="https://i.ibb.co/vx5JN3fM/trader-Sphere-beta-screenshot.png" alt="trader-Sphere-beta-screenshot" border="0"></a>
+<a href="https://ibb.co/GfgMzmP2"><img src="https://i.ibb.co/7x7pshyW/trader-Sphere-beta-screenshot.png" alt="trader-Sphere-beta-screenshot" border="0"></a>
+<a href="https://tradersphere.netlify.app/">Live Demo>/a>
 
 ## Features
 
