@@ -73,10 +73,32 @@ The modular, resizable layout allows traders to tailor their experience based on
 - ✅ Data filtering and pagination
 - ✅ Testing framework setup with Vitest
 - ✅ Modular widget system
+- ✅ Live connection status indicator with animations
+- ✅ Optimized table performance with virtualization
+- ✅ Responsive search functionality
 - 🔄 Customizable chart widgets (in progress)
 - 🔄 User settings and preferences (in progress)
 - ⬜ Advanced technical indicators
 - ⬜ Portfolio tracking features
+- ⬜ Custom widget development framework
+- ⬜ Data export functionality
+
+## Recent Updates
+
+### Market Summary Table Enhancements
+
+- Added live connection status indicator with animated feedback
+- Implemented optimized table virtualization for better performance
+- Enhanced search functionality with global and column-specific filtering
+- Improved pagination controls with configurable page sizes
+- Added responsive design for better mobile experience
+
+### Technical Improvements
+
+- Refactored components for better maintainability
+- Implemented proper TypeScript interfaces
+- Added Framer Motion animations for better UX
+- Optimized CSS with modular styling
 
 ## Getting Started
 
