@@ -13,10 +13,18 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: ["rollup/parseAst"],
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "framer-motion"],
+          table: ["@tanstack/react-table", "@tanstack/react-virtual"],
+        },
+      },
     },
     sourcemap: true,
     outDir: "dist",
-    assetsDir: "assets",
+  },
+  optimizeDeps: {
+    include: ["rollup"],
   },
   server: {
     port: 3000,

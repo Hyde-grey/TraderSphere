@@ -28,6 +28,7 @@
     "react-icons": "^5.5.0",
     "react-resizable": "^3.0.5",
     "reconnecting-websocket": "^4.4.0",
+    "rollup": "^4.9.6",
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
@@ -55,7 +56,6 @@
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
-    "rollup": "^4.9.6",
     "tailwindcss": "^4.0.11",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
