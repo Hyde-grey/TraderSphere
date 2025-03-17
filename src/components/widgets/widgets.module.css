@@ -280,3 +280,32 @@
   display: flex;
   width: 100%;
 }
+
+@media only screen and (max-width: 600px) {
+  .headerContent h3 {
+    font-size: 1.1rem;
+  }
+
+  .tableContainer td {
+    font-size: 1rem;
+    padding: 0.4rem 0.3rem;
+  }
+
+  .pagination {
+    padding: 0.5rem;
+  }
+
+  .paginationButton {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .pageInfo {
+    font-size: 0.8rem;
+  }
+
+  .pageSizeSelect {
+    font-size: 0.9rem;
+    padding: 0.2rem;
+  }
+}
