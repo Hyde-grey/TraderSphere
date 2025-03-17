@@ -19,12 +19,14 @@ const MarketSummaryTableHeader = ({
               style={{ width: `${100 / headerGroup.headers.length}%` }}
             >
               <div className={styles.headerContent}>
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
+                <h3>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </h3>
                 {header.column.getCanFilter() && (
                   <div className={styles.columnFilter}>
                     <input
