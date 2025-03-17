@@ -11,8 +11,8 @@ export default defineConfig({
     },
   },
   build: {
+    target: "esnext",
     rollupOptions: {
-      external: ["rollup"],
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "framer-motion"],
@@ -24,7 +24,10 @@ export default defineConfig({
     outDir: "dist",
   },
   optimizeDeps: {
-    exclude: ["rollup"],
+    force: true,
+    esbuildOptions: {
+      target: "esnext",
+    },
   },
   server: {
     port: 3000,
