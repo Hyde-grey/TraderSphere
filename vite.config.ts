@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ["rollup/parseAst"],
+      external: ["rollup"],
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "framer-motion"],
@@ -24,7 +24,7 @@ export default defineConfig({
     outDir: "dist",
   },
   optimizeDeps: {
-    include: ["rollup"],
+    exclude: ["rollup"],
   },
   server: {
     port: 3000,
