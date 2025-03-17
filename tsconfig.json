@@ -5,7 +5,11 @@
     "jsx": "react-jsx",
     "types": [],
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "baseUrl": "./src",
     "paths": {
       "@components/*": ["components/*"],

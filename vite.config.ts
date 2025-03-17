@@ -13,21 +13,13 @@ export default defineConfig({
   build: {
     target: "esnext",
     rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ["react", "react-dom", "framer-motion"],
-          table: ["@tanstack/react-table", "@tanstack/react-virtual"],
-        },
-      },
+      external: [/^node:.*/, "rollup", "rollup/parseAst"],
     },
     sourcemap: true,
     outDir: "dist",
   },
   optimizeDeps: {
-    force: true,
-    esbuildOptions: {
-      target: "esnext",
-    },
+    exclude: ["vitest"],
   },
   server: {
     port: 3000,
