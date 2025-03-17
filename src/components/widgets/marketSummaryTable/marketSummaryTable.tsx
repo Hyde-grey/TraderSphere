@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import LiveIndicator from "./liveIndicator";
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -6,14 +7,15 @@ import {
   useReactTable,
   ColumnFiltersState,
   getFilteredRowModel,
+  Table,
 } from "@tanstack/react-table";
 import { useProcessMarketData } from "./useProcessMarketData";
-import { columns } from "./marketSummaryTableConfig";
+import { columns, MarketData } from "./marketSummaryTableConfig";
 
 import styles from "../widgets.module.css";
 import MarketSummaryTableHeader from "./marketSummaryTableHeader";
 import MarketSummaryTableBody from "./marketSummaryTableBody";
-import PaginationControls from "./PafinationControls";
+import PaginationControls from "./marketSummaryTablePaginationControls";
 
 const MarketSummaryTable = () => {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -29,33 +31,11 @@ const MarketSummaryTable = () => {
     loading,
     error,
     isConnected,
-    liveError,
   } = useProcessMarketData();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [tableHeight, setTableHeight] = useState<number>(0);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    setTableHeight(containerRef.current.clientHeight);
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        const height = entry.contentRect.height;
-        setTableHeight(height);
-      }
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
-  const table = useReactTable({
+  const table: Table<MarketData> = useReactTable({
     data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -90,6 +70,7 @@ const MarketSummaryTable = () => {
   return (
     <div className={styles.tableContainer}>
       <div className={styles.tableSearch}>
+        <LiveIndicator isConnected />
         <input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
@@ -97,7 +78,6 @@ const MarketSummaryTable = () => {
           className={styles.searchInput}
         />
       </div>
-
       <div
         ref={containerRef}
         className={styles.virtualTableContainer}
@@ -105,7 +85,7 @@ const MarketSummaryTable = () => {
       >
         <table className={styles.table}>
           <thead>
-            <MarketSummaryTableHeader table={table} />
+            <MarketSummaryTableHeader tableHeaders={table.getHeaderGroups()} />
           </thead>
           <MarketSummaryTableBody table={table} containerRef={containerRef} />
         </table>

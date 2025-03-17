@@ -1,15 +1,17 @@
-import { flexRender, Table } from "@tanstack/react-table";
+import { flexRender, HeaderGroup, Table } from "@tanstack/react-table";
 import styles from "../widgets.module.css";
 import { MarketData } from "./marketSummaryTableConfig";
 
 type MarketSummaryTableHeaderProps = {
-  table: Table<MarketData>;
+  tableHeaders: HeaderGroup<MarketData>[];
 };
 
-const MarketSummaryTableHeader = ({ table }: MarketSummaryTableHeaderProps) => {
+const MarketSummaryTableHeader = ({
+  tableHeaders,
+}: MarketSummaryTableHeaderProps) => {
   return (
     <>
-      {table.getHeaderGroups().map((headerGroup) => (
+      {tableHeaders.map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => (
             <th key={header.id}>
