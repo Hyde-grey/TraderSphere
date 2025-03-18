@@ -203,7 +203,7 @@ h1 span {
 }
 
 :global(.react-grid-item) {
-  transition: all 0.3s ease;
+  transition: width 0.1s ease, height 0.1s ease;
   border-radius: 1rem;
   overflow: hidden;
 }
@@ -211,11 +211,15 @@ h1 span {
 /* ===== Grid Item States ===== */
 :global(.react-grid-item.react-grid-placeholder) {
   background: rgba(0, 255, 242, 0.1);
-  border: 2px dashed rgba(0, 255, 242, 0.3);
-  border-radius: 1rem;
+  border: 1px dashed rgba(0, 255, 242, 0.3);
   transition-duration: 0.1s;
   z-index: 2;
-  box-shadow: 0 0 15px rgba(0, 255, 242, 0.2);
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }
 
 :global(.react-grid-item.react-draggable-dragging) {
