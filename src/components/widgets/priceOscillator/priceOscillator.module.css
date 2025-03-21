@@ -1,0 +1,84 @@
+.priceOscillatorContainer {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header h2 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.chartContainer {
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 3rem);
+}
+
+.chartContainer svg {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Grid Styles */
+:global(.grid line) {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+:global(.grid path) {
+  stroke-width: 0;
+}
+
+/* Axis Styles */
+:global(.y-axis line) {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+:global(.y-axis path) {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+:global(.y-axis text) {
+  fill: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+/* Price Bar Styles */
+:global(.price-bar) {
+  transition: opacity 0.2s ease;
+}
+
+:global(.price-bar:hover) {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Bar border styles */
+:global(.price-bar-border) {
+  stroke: white;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* You can also style specific bars using data attributes */
+:global(.price-bar[data-value="positive"]) {
+  filter: drop-shadow(0 0 2px rgba(123, 221, 213, 0.3));
+}
+
+:global(.price-bar[data-value="negative"]) {
+  filter: drop-shadow(0 0 2px rgba(147, 112, 219, 0.3));
+}
