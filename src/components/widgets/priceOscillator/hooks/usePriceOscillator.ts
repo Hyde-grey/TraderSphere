@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import { useFetchData } from "../../../hooks/useFetchData";
 import { useProcessMarketData } from "../../marketSummaryTable/useProcessMarketData";
 
 type Dimensions = {
@@ -10,218 +9,278 @@ type Dimensions = {
 
 type usePriceOscillatorProps = {
   dimensions: Dimensions;
-  symbol?: string;
+  selectedSymbol?: string;
 };
 
 export function usePriceOscillator({
-  symbol,
+  selectedSymbol,
   dimensions,
 }: usePriceOscillatorProps) {
   const [priceChangePercent, setPriceChangePercent] = useState(0);
-  const [prevPriceChangePercent, setPrevPriceChangePercent] = useState(0);
-  const { marketData, loading, error, isConnected, liveError } =
-    useProcessMarketData();
-
-  useEffect(() => {
-    if (!marketData || !symbol || symbol.trim() === "") return;
-
-    const filteredData =
-      marketData
-        .map((item) => {
-          if (item.symbol.toLowerCase() === symbol.toLowerCase()) {
-            return parseFloat(item.priceChangePercent);
-          }
-          return;
-        })
-        .filter(Boolean)[0] || 0;
-
-    setPrevPriceChangePercent(priceChangePercent);
-    setPriceChangePercent(filteredData);
-  }, [marketData, symbol]);
+  const [filteredData, setFilteredData] = useState<{
+    priceChangePercent: number;
+    lastPrice: string;
+  }>({
+    priceChangePercent: 0,
+    lastPrice: "0.00",
+  });
+  const { marketData } = useProcessMarketData();
 
   const svgRef = useRef<SVGSVGElement>(null);
+  const isInitialRender = useRef(true);
+
+  useEffect(() => {
+    if (!marketData || !selectedSymbol?.trim()) return;
+
+    const matchingItem = marketData.find(
+      (item) => item.symbol.toLowerCase() === selectedSymbol.toLowerCase()
+    );
+
+    if (matchingItem) {
+      const newPriceChangePercent = parseFloat(matchingItem.priceChangePercent);
+      setPriceChangePercent(newPriceChangePercent);
+      setFilteredData({
+        priceChangePercent: newPriceChangePercent,
+        lastPrice: matchingItem.lastPrice,
+      });
+    }
+  }, [marketData, selectedSymbol]);
 
   useEffect(() => {
     if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0)
       return;
 
-    // Clear previous content
-    d3.select(svgRef.current).selectAll("*").remove();
-
-    // Select the SVG element
     const svg = d3.select(svgRef.current);
 
-    // Set margins for visualization
     const margin = {
-      top: 20,
+      top: 40,
       right: 60,
-      bottom: 30,
-      left: 20,
+      bottom: 40,
+      left: 40,
     };
 
+    // Use numeric values for calculations
     const width = dimensions.width;
     const height = dimensions.height;
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
 
-    // Set SVG viewBox
-    svg
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height]);
-
+    // Create scale with fixed domain for percentage
     const yScale = d3
       .scaleLinear()
       .domain([-10, 10])
-      .range([height - margin.bottom, margin.top]);
+      .range([height - margin.bottom, margin.top])
+      .nice();
 
-    // Create grid lines
-    const yGrid = d3
-      .axisRight(yScale)
-      .tickSize(-width + margin.left + margin.right)
-      .tickFormat(() => "")
-      .ticks(10);
+    // Keep SVG at 100% for responsive behavior
+    svg.attr("width", "100%").attr("height", "100%");
 
-    // Add grid lines
-    svg
-      .append("g")
-      .attr("class", "grid")
-      .attr("transform", `translate(${width - margin.right}, 0)`)
-      .call(yGrid);
+    if (isInitialRender.current) {
+      svg.selectAll("*").remove();
 
-    // Create and add y-axis
-    const yAxis = d3
-      .axisRight(yScale)
-      .tickFormat((d) => `${d}%`)
-      .ticks(5);
+      // Create main chart group with proper transform
+      const g = svg
+        .append("g")
+        .attr("class", "chart-group")
+        .attr("transform", `translate(${margin.left},0)`);
 
-    svg
-      .append("g")
-      .attr("class", "y-axis")
-      .attr("transform", `translate(${width - margin.right}, 0)`)
-      .call(yAxis);
+      // Add grid lines
+      g.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(${chartWidth}, 0)`)
+        .call(
+          d3
+            .axisRight(yScale)
+            .tickSize(-chartWidth)
+            .tickFormat(() => "")
+            .ticks(10)
+        )
+        .call((g) => g.selectAll(".domain").remove());
 
-    // Define gradients
-    defineGradients(svg);
+      // Add y-axis
+      g.append("g")
+        .attr("class", "y-axis")
+        .attr("transform", `translate(${chartWidth}, 0)`)
+        .call(
+          d3
+            .axisRight(yScale)
+            .tickFormat((d) => `${d}%`)
+            .ticks(5)
+        );
 
-    // Add bars
-    addBars(
-      svg,
-      margin,
-      yScale,
-      width,
-      priceChangePercent,
-      prevPriceChangePercent
-    );
-  }, [dimensions, priceChangePercent, prevPriceChangePercent]);
+      // Add zero line
+      g.append("line")
+        .attr("class", "zero-line")
+        .attr("x1", 0)
+        .attr("x2", chartWidth)
+        .attr("y1", yScale(0))
+        .attr("y2", yScale(0))
+        .attr("stroke", "rgba(255,255,255,0.2)")
+        .attr("stroke-dasharray", "2,2");
 
-  return svgRef;
+      defineGradients(svg);
+      isInitialRender.current = false;
+    } else {
+      // Update grid lines
+      const grid = svg.select(".grid") as d3.Selection<
+        SVGGElement,
+        unknown,
+        null,
+        undefined
+      >;
+      if (!grid.empty()) {
+        grid.attr("transform", `translate(${chartWidth}, 0)`).call(
+          d3
+            .axisRight(yScale)
+            .tickSize(-chartWidth)
+            .tickFormat(() => "")
+            .ticks(10)
+        );
+        grid.selectAll(".domain").remove();
+      }
+
+      // Update y-axis
+      const yAxis = svg.select(".y-axis") as d3.Selection<
+        SVGGElement,
+        unknown,
+        null,
+        undefined
+      >;
+      if (!yAxis.empty()) {
+        yAxis.attr("transform", `translate(${chartWidth}, 0)`).call(
+          d3
+            .axisRight(yScale)
+            .tickFormat((d) => `${d}%`)
+            .ticks(5)
+        );
+      }
+
+      // Update zero line
+      const zeroLine = svg.select(".zero-line") as d3.Selection<
+        SVGLineElement,
+        unknown,
+        null,
+        undefined
+      >;
+      if (!zeroLine.empty()) {
+        zeroLine
+          .attr("x2", chartWidth)
+          .attr("y1", yScale(0))
+          .attr("y2", yScale(0));
+      }
+    }
+
+    updateBar(svg, yScale, chartWidth, priceChangePercent);
+  }, [dimensions, priceChangePercent]);
+
+  return { svgRef, filteredData };
 }
 
 function defineGradients(
   svg: d3.Selection<SVGSVGElement, unknown, null, undefined>
 ) {
-  // Cyan gradient for positive values
-  const cyanGradient = svg
-    .append("defs")
-    .append("linearGradient")
-    .attr("id", "cyanGradient")
-    .attr("x1", "0%")
-    .attr("x2", "0%")
-    .attr("y1", "0%")
-    .attr("y2", "100%");
+  const gradients = [
+    {
+      id: "cyanGradient",
+      color: "rgb(123, 221, 213)",
+      direction: "down",
+    },
+    {
+      id: "purpleGradient",
+      color: "rgb(147, 112, 219)",
+      direction: "up",
+    },
+  ];
 
-  cyanGradient
-    .append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "rgb(123, 221, 213)")
-    .attr("stop-opacity", 1);
+  gradients.forEach(({ id, color, direction }) => {
+    const gradient = svg
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", id)
+      .attr("x1", "0%")
+      .attr("x2", "0%")
+      .attr("y1", direction === "down" ? "0%" : "100%")
+      .attr("y2", direction === "down" ? "100%" : "0%");
 
-  cyanGradient
-    .append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "rgba(123, 221, 213, 0)")
-    .attr("stop-opacity", 0);
+    gradient
+      .append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", color)
+      .attr("stop-opacity", 1);
 
-  // Purple gradient for negative values
-  const purpleGradient = svg
-    .append("defs")
-    .append("linearGradient")
-    .attr("id", "purpleGradient")
-    .attr("x1", "0%")
-    .attr("x2", "0%")
-    .attr("y1", "100%")
-    .attr("y2", "0%");
-
-  purpleGradient
-    .append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "rgb(147, 112, 219)")
-    .attr("stop-opacity", 1);
-
-  purpleGradient
-    .append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "rgba(147, 112, 219, 0)")
-    .attr("stop-opacity", 0);
+    gradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", color)
+      .attr("stop-opacity", 0);
+  });
 }
 
-function addBars(
+function updateBar(
   svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-  margin: { top: number; right: number; bottom: number; left: number },
   yScale: d3.ScaleLinear<number, number>,
-  width: number,
-  priceChangePercent: number,
-  prevPriceChangePercent: number
+  chartWidth: number,
+  priceChangePercent: number
 ) {
-  const barWidth = 30;
-  const barSpacing = 50;
-
-  // Calculate starting position from right
-  const rightEdge = width - margin.right;
-  const firstBarX = rightEdge - barWidth - 50; // 50px from right edge
-
-  // Third bar: current price change (dynamic)
-  const thirdBarX = firstBarX - barSpacing * 2;
-
-  // Determine if the price change is positive or negative
+  const barWidth = 60;
+  const barX = chartWidth - barWidth - 10;
   const isPositive = priceChangePercent >= 0;
-  const barHeight = Math.abs(yScale(priceChangePercent) - yScale(0));
-  const barY = isPositive ? yScale(priceChangePercent) : yScale(0);
 
-  // Add the dynamic bar based on price change percent with transition
-  const bar = svg
-    .append("rect")
-    .attr("class", "price-bar")
-    .attr("data-value", isPositive ? "positive" : "negative")
-    .attr("x", firstBarX)
-    .attr("y", isPositive ? yScale(prevPriceChangePercent) : yScale(0))
-    .attr("width", barWidth)
-    .attr("height", Math.abs(yScale(prevPriceChangePercent) - yScale(0)))
-    .attr("rx", 4)
-    .attr("ry", 4)
-    .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)");
+  // Calculate bar dimensions relative to zero line
+  const zeroY = yScale(0);
+  const valueY = yScale(priceChangePercent);
+  const barHeight = Math.abs(zeroY - valueY);
+  const barY = isPositive ? valueY : zeroY;
 
-  // Animate the bar
-  bar
-    .transition()
-    .duration(500)
-    .ease(d3.easeCubicInOut)
-    .attr("y", barY)
-    .attr("height", barHeight);
+  const chartGroup = svg.select<SVGGElement>(".chart-group");
+  const bar = chartGroup.select<SVGRectElement>(".price-bar");
 
-  // Add border for the dynamic bar with transition
-  const border = svg
-    .append("line")
-    .attr("class", "price-bar-border")
-    .attr("x1", firstBarX)
-    .attr("y1", yScale(prevPriceChangePercent))
-    .attr("x2", firstBarX + barWidth)
-    .attr("y2", yScale(prevPriceChangePercent));
+  if (bar.empty()) {
+    chartGroup
+      .append("rect")
+      .attr("class", "price-bar")
+      .attr("x", barX)
+      .attr("width", barWidth)
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .attr("data-value", isPositive ? "positive" : "negative")
+      .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)")
+      .attr("y", barY)
+      .attr("height", barHeight);
+  } else {
+    bar
+      .attr("data-value", isPositive ? "positive" : "negative")
+      .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)")
+      .attr("x", barX)
+      .transition()
+      .duration(500)
+      .ease(d3.easeCubicInOut)
+      .attr("y", barY)
+      .attr("height", barHeight);
+  }
 
-  // Animate the border
-  border
-    .transition()
-    .duration(500)
-    .ease(d3.easeCubicInOut)
-    .attr("y1", yScale(priceChangePercent))
-    .attr("y2", yScale(priceChangePercent));
+  // Update or create border line
+  const border = chartGroup.select<SVGLineElement>(".price-bar-border");
+  const borderY = yScale(priceChangePercent);
+
+  if (border.empty()) {
+    chartGroup
+      .append("line")
+      .attr("class", "price-bar-border")
+      .attr("x1", barX)
+      .attr("x2", barX + barWidth)
+      .attr("y1", borderY)
+      .attr("y2", borderY)
+      .attr("stroke", "rgba(255,255,255,0.5)")
+      .attr("stroke-width", 1);
+  } else {
+    border
+      .attr("x1", barX)
+      .attr("x2", barX + barWidth)
+      .transition()
+      .duration(500)
+      .ease(d3.easeCubicInOut)
+      .attr("y1", borderY)
+      .attr("y2", borderY);
+  }
 }
