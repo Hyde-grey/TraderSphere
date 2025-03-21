@@ -4,6 +4,7 @@ import { useDimensions } from "./hooks/useDimensions";
 import { usePriceOscillator } from "./hooks/usePriceOscillator";
 import styles from "./priceOscillator.module.css";
 import stylesWidgets from "../widgets.module.css";
+import DataDisplayLayout from "../displaysLayouts/dataDisplayLayout";
 
 export function PriceOscillator() {
   const [symbol, setSymbol] = useState("");
@@ -24,6 +25,8 @@ export function PriceOscillator() {
       </div>
       <div className={styles.chartContainer}>
         <svg ref={svgRef} />
+
+        <DataDisplayLayout header={symbol.toUpperCase()} data={"5.345"} />
       </div>
     </div>
   );
