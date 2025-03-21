@@ -8,6 +8,8 @@ import { useScreenSize } from "../hooks/useScreenSize";
 import FadeInMotion from "../motion/fadeInMotion";
 import PriceOscillator from "../widgets/priceOscillator/priceOscillator";
 
+import { SymbolProvider } from "../../contexts/SymbolContext";
+
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
 const DashboardLayout = () => {
@@ -28,84 +30,86 @@ const DashboardLayout = () => {
       ];
 
   return (
-    <>
-      <motion.div
-        className={styles.container}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <div className={styles.componentPattern}></div>
-        <ResponsiveGridLayout
-          className="layout"
-          layout={layout}
-          cols={24}
-          rowHeight={50}
-          bounds={{ top: 0, right: 0, bottom: 0, left: 0 }}
-          draggableHandle=".dragMe"
-          useCSSTransforms={true}
+    <SymbolProvider>
+      <>
+        <motion.div
+          className={styles.container}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
-          <FadeInMotion key="widget1" className={styles.hudPanel}>
-            <div className={styles.hudElement}>
-              <div
-                className={`${styles.hudElementContent} dragMe`}
-                style={{ cursor: "move" }}
-              >
-                <h2>Market Overview</h2>
+          <div className={styles.componentPattern}></div>
+          <ResponsiveGridLayout
+            className="layout"
+            layout={layout}
+            cols={24}
+            rowHeight={50}
+            bounds={{ top: 0, right: 0, bottom: 0, left: 0 }}
+            draggableHandle=".dragMe"
+            useCSSTransforms={true}
+          >
+            <FadeInMotion key="widget1" className={styles.hudPanel}>
+              <div className={styles.hudElement}>
+                <div
+                  className={`${styles.hudElementContent} dragMe`}
+                  style={{ cursor: "move" }}
+                >
+                  <h2>Market Overview</h2>
+                </div>
+                <div className={styles.widgetContent}>
+                  <MarketSummaryTable />
+                </div>
               </div>
-              <div className={styles.widgetContent}>
-                <MarketSummaryTable />
-              </div>
-            </div>
-          </FadeInMotion>
+            </FadeInMotion>
 
-          <FadeInMotion key="widget2" className={styles.hudPanel}>
-            <div className={styles.hudElement}>
-              <div
-                className={`${styles.hudElementContent} dragMe`}
-                style={{ cursor: "move" }}
-              >
-                <h2>Candlestick Chart</h2>
+            <FadeInMotion key="widget2" className={styles.hudPanel}>
+              <div className={styles.hudElement}>
+                <div
+                  className={`${styles.hudElementContent} dragMe`}
+                  style={{ cursor: "move" }}
+                >
+                  <h2>Candlestick Chart</h2>
+                </div>
+                <div className={styles.widgetContent}>
+                  <div>Chart content coming soon...</div>
+                </div>
               </div>
-              <div className={styles.widgetContent}>
-                <div>Chart content coming soon...</div>
-              </div>
-            </div>
-          </FadeInMotion>
+            </FadeInMotion>
 
-          <FadeInMotion key="widget3" className={styles.hudPanel}>
-            <div className={styles.hudElement}>
-              <div
-                className={`${styles.hudElementContent} dragMe`}
-                style={{ cursor: "move" }}
-              >
-                <h2>Recent Trades</h2>
+            <FadeInMotion key="widget3" className={styles.hudPanel}>
+              <div className={styles.hudElement}>
+                <div
+                  className={`${styles.hudElementContent} dragMe`}
+                  style={{ cursor: "move" }}
+                >
+                  <h2>Recent Trades</h2>
+                </div>
+                <div className={styles.widgetContent}>
+                  <div>Trades content coming soon...</div>
+                </div>
               </div>
-              <div className={styles.widgetContent}>
-                <div>Trades content coming soon...</div>
-              </div>
-            </div>
-          </FadeInMotion>
+            </FadeInMotion>
 
-          <FadeInMotion key="widget4" className={styles.hudPanel}>
-            <div className={styles.hudElement}>
-              <div
-                className={`${styles.hudElementContent} dragMe`}
-                style={{ cursor: "move" }}
-              >
-                <h2>Price Oscillator</h2>
+            <FadeInMotion key="widget4" className={styles.hudPanel}>
+              <div className={styles.hudElement}>
+                <div
+                  className={`${styles.hudElementContent} dragMe`}
+                  style={{ cursor: "move" }}
+                >
+                  <h2>Price Oscillator</h2>
+                </div>
+                <div className={styles.widgetContent}>
+                  <PriceOscillator />
+                </div>
               </div>
-              <div className={styles.widgetContent}>
-                <PriceOscillator />
-              </div>
-            </div>
-          </FadeInMotion>
-        </ResponsiveGridLayout>
-      </motion.div>
-      <h1 className={styles.futuristicText}>
-        Trader<span>Sphere</span>
-      </h1>
-    </>
+            </FadeInMotion>
+          </ResponsiveGridLayout>
+        </motion.div>
+        <h1 className={styles.futuristicText}>
+          Trader<span>Sphere</span>
+        </h1>
+      </>
+    </SymbolProvider>
   );
 };
 
