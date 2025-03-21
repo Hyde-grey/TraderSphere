@@ -6,6 +6,7 @@ import styles from "./gridLayout.module.css";
 import MarketSummaryTable from "../widgets/marketSummaryTable/marketSummaryTable";
 import { useScreenSize } from "../hooks/useScreenSize";
 import FadeInMotion from "../motion/fadeInMotion";
+import PriceOscillator from "../widgets/priceOscillator/priceOscillator";
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
@@ -92,10 +93,10 @@ const DashboardLayout = () => {
                 className={`${styles.hudElementContent} dragMe`}
                 style={{ cursor: "move" }}
               >
-                <h2>Order Book</h2>
+                <h2>Price Oscillator</h2>
               </div>
               <div className={styles.widgetContent}>
-                <div>Order book content coming soon...</div>
+                <PriceOscillator />
               </div>
             </div>
           </FadeInMotion>
