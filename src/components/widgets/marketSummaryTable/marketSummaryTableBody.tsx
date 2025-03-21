@@ -2,6 +2,7 @@ import { flexRender, Table } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import styles from "../widgets.module.css";
 import { MarketData } from "./marketSummaryTableConfig";
+import { useSymbolContext } from "../../../contexts/SymbolContext";
 
 type MarketSummaryTableBodyProps = {
   table: Table<MarketData>;
@@ -15,6 +16,7 @@ const MarketSummaryTableBody = ({
   table,
   containerRef,
 }: MarketSummaryTableBodyProps) => {
+  const { setSelectedSymbol } = useSymbolContext();
   const columnCount = table.getAllColumns().length;
   const columnWidth = `${100 / columnCount}%`;
 
@@ -39,6 +41,7 @@ const MarketSummaryTableBody = ({
             const row = rows[virtualRow.index];
             return (
               <tr
+                onClick={() => setSelectedSymbol(row.id)}
                 key={row.id}
                 className={styles.dataRow}
                 style={{
