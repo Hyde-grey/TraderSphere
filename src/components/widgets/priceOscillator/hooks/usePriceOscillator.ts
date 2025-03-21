@@ -28,6 +28,7 @@ export function usePriceOscillator({
 
   const svgRef = useRef<SVGSVGElement>(null);
   const isInitialRender = useRef(true);
+  const [currentRange, setCurrentRange] = useState<[number, number]>([-2, 2]);
 
   useEffect(() => {
     if (!marketData || !selectedSymbol?.trim()) return;
@@ -43,6 +44,7 @@ export function usePriceOscillator({
         priceChangePercent: newPriceChangePercent,
         lastPrice: matchingItem.lastPrice,
       });
+      setCurrentRange(getDynamicRange(newPriceChangePercent));
     }
   }, [marketData, selectedSymbol]);
 
@@ -68,7 +70,7 @@ export function usePriceOscillator({
     // Create scale with fixed domain for percentage
     const yScale = d3
       .scaleLinear()
-      .domain([-10, 10])
+      .domain(currentRange)
       .range([height - margin.bottom, margin.top])
       .nice();
 
@@ -171,7 +173,7 @@ export function usePriceOscillator({
     }
 
     updateBar(svg, yScale, chartWidth, priceChangePercent);
-  }, [dimensions, priceChangePercent]);
+  }, [dimensions, priceChangePercent, currentRange]);
 
   return { svgRef, filteredData };
 }
@@ -282,5 +284,20 @@ function updateBar(
       .ease(d3.easeCubicInOut)
       .attr("y1", borderY)
       .attr("y2", borderY);
+  }
+}
+
+function getDynamicRange(priceChangePercent: number): [number, number] {
+  const absChange = Math.abs(priceChangePercent);
+
+  if (absChange <= 2) {
+    return [-2, 2];
+  } else if (absChange <= 5) {
+    return [-5, 5];
+  } else if (absChange <= 10) {
+    return [-10, 10];
+  } else {
+    const ceiling = Math.ceil(absChange / 5) * 5;
+    return [-ceiling, ceiling];
   }
 }
