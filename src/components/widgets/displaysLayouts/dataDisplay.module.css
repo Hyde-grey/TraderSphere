@@ -1,9 +1,8 @@
 .displayContainer {
   position: relative;
-  width: min(25%, 25vh);
-  aspect-ratio: 1 / 1;
-  max-width: 25%;
-  max-height: 25%;
+  min-height: 25%;
+  aspect-ratio: 1 / 0.6;
+
   margin-left: 10px;
 }
 
