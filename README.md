@@ -121,6 +121,59 @@ yarn test
 yarn build
 ```
 
+## Usage Guide
+
+### Dashboard Layout
+
+1. **Dragging Widgets**
+
+   - Click and hold the header (title bar) of any widget to drag it
+   - Widgets can be repositioned anywhere on the dashboard
+   - The layout automatically adjusts to prevent overlapping
+
+2. **Resizing Widgets**
+   - Hover over the edges or corners of any widget to see resize handles
+   - Click and drag these handles to adjust the widget size
+   - Widgets maintain their aspect ratio while resizing
+
+### Market Overview Table
+
+1. **Searching for Symbols**
+
+   - Use the search bar in the Market Overview table
+   - Type any symbol (e.g., "BTC", "ETH", "AAPL")
+   - Results filter in real-time as you type
+
+2. **Sorting and Filtering**
+   - Click column headers to sort by that column
+   - Use the filter icons in column headers for advanced filtering
+   - Multiple filters can be applied simultaneously
+
+### Price Oscillator
+
+1. **Monitoring Specific Symbols**
+
+   - Enter a symbol in the search input at the top of the Price Oscillator
+   - The chart will update in real-time with price changes
+   - The display shows:
+     - Current price change percentage
+     - Last price
+     - Historical price changes (last 10 updates)
+
+2. **Reading the Chart**
+   - Green bars indicate positive price changes
+   - Purple bars indicate negative price changes
+   - Bar height represents the magnitude of change
+   - Most recent changes are on the right
+   - Older changes fade to show historical progression
+
+### General Tips
+
+- The dashboard is fully responsive and works on both desktop and mobile
+- Widget positions and sizes are saved automatically
+- Use the Live Indicator to confirm real-time data connection
+- Hover over elements for additional information and tooltips
+
 ## License
 
 [MIT](LICENSE)
