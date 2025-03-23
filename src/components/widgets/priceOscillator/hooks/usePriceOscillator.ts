@@ -7,16 +7,26 @@ type Dimensions = {
   height: number;
 };
 
+type PriceHistoryItem = {
+  priceChangePercent: number;
+  timestamp: number;
+};
+
 type usePriceOscillatorProps = {
   dimensions: Dimensions;
   selectedSymbol?: string;
 };
+
+const TOTAL_BARS = 11;
 
 export function usePriceOscillator({
   selectedSymbol,
   dimensions,
 }: usePriceOscillatorProps) {
   const [priceChangePercent, setPriceChangePercent] = useState(0);
+  const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>(
+    Array(TOTAL_BARS).fill({ priceChangePercent: 0, timestamp: Date.now() })
+  );
   const [filteredData, setFilteredData] = useState<{
     priceChangePercent: number;
     lastPrice: string;
@@ -45,6 +55,18 @@ export function usePriceOscillator({
         lastPrice: matchingItem.lastPrice,
       });
       setCurrentRange(getDynamicRange(newPriceChangePercent));
+
+      // Update history by shifting values left and adding new value at the end
+      setPriceHistory((prev) => {
+        const newHistory = [
+          ...prev.slice(1),
+          {
+            priceChangePercent: newPriceChangePercent,
+            timestamp: Date.now(),
+          },
+        ];
+        return newHistory;
+      });
     }
   }, [marketData, selectedSymbol]);
 
@@ -172,8 +194,8 @@ export function usePriceOscillator({
       }
     }
 
-    updateBar(svg, yScale, chartWidth, priceChangePercent);
-  }, [dimensions, priceChangePercent, currentRange]);
+    updateBars(svg, yScale, chartWidth, priceHistory);
+  }, [dimensions, priceHistory, currentRange]);
 
   return { svgRef, filteredData };
 }
@@ -218,73 +240,92 @@ function defineGradients(
   });
 }
 
-function updateBar(
+function updateBars(
   svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
   yScale: d3.ScaleLinear<number, number>,
   chartWidth: number,
-  priceChangePercent: number
+  history: PriceHistoryItem[]
 ) {
-  const barWidth = 60;
-  const barX = chartWidth - barWidth - 10;
-  const isPositive = priceChangePercent >= 0;
-
-  // Calculate bar dimensions relative to zero line
-  const zeroY = yScale(0);
-  const valueY = yScale(priceChangePercent);
-  const barHeight = Math.abs(zeroY - valueY);
-  const barY = isPositive ? valueY : zeroY;
+  const barWidth = 30; // Thinner bars to fit all 10
+  const barSpacing = 15; // Smaller spacing between bars
+  const totalBarWidth = barWidth + barSpacing;
+  const rightPadding = 1; // Padding from the right edge to match the margin
 
   const chartGroup = svg.select<SVGGElement>(".chart-group");
-  const bar = chartGroup.select<SVGRectElement>(".price-bar");
 
-  if (bar.empty()) {
-    chartGroup
-      .append("rect")
-      .attr("class", "price-bar")
-      .attr("x", barX)
-      .attr("width", barWidth)
-      .attr("rx", 4)
-      .attr("ry", 4)
-      .attr("data-value", isPositive ? "positive" : "negative")
-      .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)")
-      .attr("y", barY)
-      .attr("height", barHeight);
-  } else {
+  // Create a group for all bars if it doesn't exist
+  let barsGroup = chartGroup.select<SVGGElement>(".bars-group");
+  if (barsGroup.empty()) {
+    barsGroup = chartGroup.append<SVGGElement>("g").attr("class", "bars-group");
+  }
+
+  // Create bar groups with data binding
+  const bars = barsGroup
+    .selectAll<SVGGElement, PriceHistoryItem>(".bar-group")
+    .data(history, (d: PriceHistoryItem, i: number) => i); // Use index as key to keep bars in place
+
+  // Remove old bars
+  bars.exit().remove();
+
+  // Add new bars
+  const barsEnter = bars.enter().append("g").attr("class", "bar-group");
+
+  // Add rectangle for each new bar
+  barsEnter.append("rect").attr("class", "price-bar").attr("width", barWidth);
+
+  // Add border line for each new bar
+  barsEnter
+    .append("line")
+    .attr("class", "price-bar-border")
+    .attr("stroke", "rgba(255,255,255,0.5)")
+    .attr("stroke-width", 1);
+
+  // Update all bars (new and existing)
+  const allBars = barsGroup.selectAll<SVGGElement, PriceHistoryItem>(
+    ".bar-group"
+  );
+
+  allBars.each(function (d: PriceHistoryItem, i: number) {
+    const group = d3.select(this);
+    const bar = group.select(".price-bar");
+    const border = group.select(".price-bar-border");
+
+    const isPositive = d.priceChangePercent >= 0;
+    const zeroY = yScale(0);
+    const valueY = yScale(d.priceChangePercent);
+    const barHeight = Math.abs(zeroY - valueY);
+    const barY = isPositive ? valueY : zeroY;
+
+    // Calculate opacity based on bar age (index)
+    // Oldest (leftmost) bar has opacity 0.3, newest (rightmost) has opacity 1
+    const opacity = 0.3 + (i * 0.7) / (TOTAL_BARS - 1);
+
+    // Fixed position for each bar index from right to left
+    const barX = chartWidth - rightPadding - (TOTAL_BARS - i) * totalBarWidth;
+
+    // Update bar
     bar
       .attr("data-value", isPositive ? "positive" : "negative")
       .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)")
+      .transition()
+      .duration(500)
+      .ease(d3.easeCubicInOut)
       .attr("x", barX)
-      .transition()
-      .duration(500)
-      .ease(d3.easeCubicInOut)
       .attr("y", barY)
-      .attr("height", barHeight);
-  }
+      .attr("height", barHeight)
+      .attr("opacity", opacity);
 
-  // Update or create border line
-  const border = chartGroup.select<SVGLineElement>(".price-bar-border");
-  const borderY = yScale(priceChangePercent);
-
-  if (border.empty()) {
-    chartGroup
-      .append("line")
-      .attr("class", "price-bar-border")
-      .attr("x1", barX)
-      .attr("x2", barX + barWidth)
-      .attr("y1", borderY)
-      .attr("y2", borderY)
-      .attr("stroke", "rgba(255,255,255,0.5)")
-      .attr("stroke-width", 1);
-  } else {
+    // Update border
     border
-      .attr("x1", barX)
-      .attr("x2", barX + barWidth)
       .transition()
       .duration(500)
       .ease(d3.easeCubicInOut)
-      .attr("y1", borderY)
-      .attr("y2", borderY);
-  }
+      .attr("x1", barX)
+      .attr("x2", barX + barWidth)
+      .attr("y1", valueY)
+      .attr("y2", valueY)
+      .attr("opacity", opacity);
+  });
 }
 
 function getDynamicRange(priceChangePercent: number): [number, number] {
