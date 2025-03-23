@@ -17,16 +17,52 @@ const DashboardLayout = () => {
 
   const layout = isMobile
     ? [
-        { i: "widget1", x: 0, y: 0, w: 24, h: 10, minH: 8, minW: 8, maxH: 18 },
-        { i: "widget2", x: 0, y: 12, w: 24, h: 10, minH: 6, minW: 6, maxH: 18 },
-        { i: "widget3", x: 0, y: 24, w: 24, h: 8, minH: 6, minW: 6 },
-        { i: "widget4", x: 0, y: 34, w: 24, h: 8, minH: 6, minW: 6 },
+        {
+          i: "marketOverview",
+          x: 0,
+          y: 0,
+          w: 24,
+          h: 10,
+          minH: 8,
+          minW: 8,
+          maxH: 18,
+        },
+        { i: "ocsillator", x: 0, y: 0, w: 24, h: 10, minH: 6, minW: 6 },
+        {
+          i: "candlestick",
+          x: 0,
+          y: 12,
+          w: 24,
+          h: 10,
+          minH: 6,
+          minW: 6,
+          maxH: 18,
+        },
+        { i: "recentTrade", x: 0, y: 24, w: 24, h: 8, minH: 6, minW: 6 },
       ]
     : [
-        { i: "widget1", x: 0, y: 0, w: 8, h: 10, minH: 6, minW: 6, maxH: 18 },
-        { i: "widget2", x: 8, y: 0, w: 16, h: 10, minH: 6, minW: 6, maxH: 18 },
-        { i: "widget3", x: 0, y: 8, w: 12, h: 9, minH: 6, minW: 6 },
-        { i: "widget4", x: 12, y: 8, w: 12, h: 9, minH: 6, minW: 6 },
+        {
+          i: "marketOverview",
+          x: 0,
+          y: 0,
+          w: 14,
+          h: 10,
+          minH: 6,
+          minW: 6,
+          maxH: 18,
+        },
+        { i: "ocsillator", x: 14, y: 0, w: 10, h: 10, minH: 6, minW: 6 },
+        {
+          i: "candlestick",
+          x: 0,
+          y: 10,
+          w: 16,
+          h: 8,
+          minH: 6,
+          minW: 6,
+          maxH: 18,
+        },
+        { i: "recentTrade", x: 16, y: 10, w: 8, h: 8, minH: 6, minW: 6 },
       ];
 
   return (
@@ -48,7 +84,7 @@ const DashboardLayout = () => {
             draggableHandle=".dragMe"
             useCSSTransforms={true}
           >
-            <FadeInMotion key="widget1" className={styles.hudPanel}>
+            <FadeInMotion key="marketOverview" className={styles.hudPanel}>
               <div className={styles.hudElement}>
                 <div
                   className={`${styles.hudElementContent} dragMe`}
@@ -62,7 +98,21 @@ const DashboardLayout = () => {
               </div>
             </FadeInMotion>
 
-            <FadeInMotion key="widget2" className={styles.hudPanel}>
+            <FadeInMotion key="ocsillator" className={styles.hudPanel}>
+              <div className={styles.hudElement}>
+                <div
+                  className={`${styles.hudElementContent} dragMe`}
+                  style={{ cursor: "move" }}
+                >
+                  <h2>Price Oscillator</h2>
+                </div>
+                <div className={styles.widgetContent}>
+                  <PriceOscillator />
+                </div>
+              </div>
+            </FadeInMotion>
+
+            <FadeInMotion key="candlestick" className={styles.hudPanel}>
               <div className={styles.hudElement}>
                 <div
                   className={`${styles.hudElementContent} dragMe`}
@@ -76,7 +126,7 @@ const DashboardLayout = () => {
               </div>
             </FadeInMotion>
 
-            <FadeInMotion key="widget3" className={styles.hudPanel}>
+            <FadeInMotion key="recentTrade" className={styles.hudPanel}>
               <div className={styles.hudElement}>
                 <div
                   className={`${styles.hudElementContent} dragMe`}
@@ -86,20 +136,6 @@ const DashboardLayout = () => {
                 </div>
                 <div className={styles.widgetContent}>
                   <div>Trades content coming soon...</div>
-                </div>
-              </div>
-            </FadeInMotion>
-
-            <FadeInMotion key="widget4" className={styles.hudPanel}>
-              <div className={styles.hudElement}>
-                <div
-                  className={`${styles.hudElementContent} dragMe`}
-                  style={{ cursor: "move" }}
-                >
-                  <h2>Price Oscillator</h2>
-                </div>
-                <div className={styles.widgetContent}>
-                  <PriceOscillator />
                 </div>
               </div>
             </FadeInMotion>
