@@ -343,28 +343,24 @@ function updateBars(
     barsGroup = chartGroup.append<SVGGElement>("g").attr("class", "bars-group");
   }
 
-  // Use D3's data binding for proper animations
   const barGroups = barsGroup
     .selectAll<SVGGElement, PriceHistoryItem>(".bar-group")
     .data(history, (d) => d.timestamp.toString());
 
-  // ENTER: Create new elements for new data points
   const enterGroups = barGroups
     .enter()
     .append("g")
     .attr("class", "bar-group")
-    .attr("transform", `translate(${startX + totalBarWidth}, 0)`) // Start off-screen to the right
+    .attr("transform", `translate(${startX + totalBarWidth}, 0)`)
     .style("opacity", 0.2);
 
-  // Add rectangle to each new group
   enterGroups
     .append("rect")
     .attr("class", "price-bar")
     .attr("width", barWidth)
-    .attr("height", 0) // Start with height 0
+    .attr("height", 0)
     .attr("y", yScale(0));
 
-  // Add border line to each new group
   enterGroups
     .append("line")
     .attr("class", "price-bar-border")
@@ -375,7 +371,6 @@ function updateBars(
     .attr("y1", yScale(0))
     .attr("y2", yScale(0));
 
-  // Add value text to each new group (optional)
   enterGroups
     .append("text")
     .attr("class", "debug-text")
@@ -386,26 +381,22 @@ function updateBars(
     .attr("fill", "white")
     .attr("opacity", 0.8);
 
-  // EXIT: Remove elements that no longer have data
   barGroups
     .exit()
     .transition()
     .duration(800)
     .ease(d3.easeCubicInOut)
-    .attr("transform", (d, i) => `translate(${-totalBarWidth * 2}, 0)`) // Slide left off screen
+    .attr("transform", (d, i) => `translate(${-totalBarWidth * 2}, 0)`)
     .style("opacity", 0)
     .remove();
 
-  // MERGE: Handle updates for both existing and new elements
   const allBarGroups = barGroups.merge(enterGroups);
 
-  // First animate the position (slide from right for new bars, shift left for existing)
   allBarGroups
     .transition()
     .duration(800)
     .ease(d3.easeCubicInOut)
     .style("opacity", (d, i) => {
-      // Calculate opacity based on index - newest bar (rightmost) is fully opaque
       return 0.2 + (i * 0.8) / Math.max(history.length - 1, 1);
     })
     .attr("transform", (d, i) => {
@@ -413,11 +404,9 @@ function updateBars(
       return `translate(${xPos}, 0)`;
     });
 
-  // Then update all the visual attributes
   allBarGroups.each(function (d, i) {
     const group = d3.select(this);
 
-    // Calculate values for this bar
     const isPositive = d.priceChangePercent >= 0;
     const zeroY = yScale(0);
     const valueY = yScale(d.priceChangePercent);
@@ -425,7 +414,6 @@ function updateBars(
     const barY = isPositive ? valueY : zeroY;
     const opacity = 0.2 + (i * 0.8) / Math.max(history.length - 1, 1);
 
-    // Update rectangle with animation
     group
       .select("rect")
       .transition()
@@ -437,7 +425,6 @@ function updateBars(
       .attr("height", barHeight)
       .attr("opacity", opacity);
 
-    // Update border line with animation
     group
       .select("line")
       .transition()
@@ -447,7 +434,6 @@ function updateBars(
       .attr("y2", valueY)
       .attr("opacity", opacity);
 
-    // Update debug text with animation
     group
       .select("text")
       .transition()
@@ -461,14 +447,15 @@ function updateBars(
 function getDynamicRange(priceChangePercent: number): [number, number] {
   const absChange = Math.abs(priceChangePercent);
 
-  if (absChange <= 2) {
-    return [-2, 2];
-  } else if (absChange <= 5) {
-    return [-5, 5];
-  } else if (absChange <= 10) {
-    return [-10, 10];
-  } else {
-    const ceiling = Math.ceil(absChange / 5) * 5;
-    return [-ceiling, ceiling];
+  switch (true) {
+    case absChange <= 2:
+      return [-2, 2];
+    case absChange <= 5:
+      return [-5, 5];
+    case absChange <= 10:
+      return [-10, 10];
+    default:
+      const ceiling = Math.ceil(absChange / 5) * 5;
+      return [-ceiling, ceiling];
   }
 }
