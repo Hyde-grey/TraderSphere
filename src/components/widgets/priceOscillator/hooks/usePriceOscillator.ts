@@ -15,6 +15,7 @@ type PriceHistoryItem = {
 type usePriceOscillatorProps = {
   dimensions: Dimensions;
   selectedSymbol?: string;
+  customRange?: [number, number];
 };
 
 const TOTAL_BARS = 11;
@@ -22,23 +23,86 @@ const TOTAL_BARS = 11;
 export function usePriceOscillator({
   selectedSymbol,
   dimensions,
+  customRange,
 }: usePriceOscillatorProps) {
   const [priceChangePercent, setPriceChangePercent] = useState(0);
-  const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>(
-    Array(TOTAL_BARS).fill({ priceChangePercent: 0, timestamp: Date.now() })
-  );
+  const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>([]);
   const [filteredData, setFilteredData] = useState<{
     priceChangePercent: number;
     lastPrice: string;
+    volume: string;
   }>({
     priceChangePercent: 0,
     lastPrice: "0.00",
+    volume: "0.00",
   });
   const { marketData } = useProcessMarketData();
 
   const svgRef = useRef<SVGSVGElement>(null);
   const isInitialRender = useRef(true);
   const [currentRange, setCurrentRange] = useState<[number, number]>([-2, 2]);
+
+  // Initialize with empty slots when component mounts
+  useEffect(() => {
+    const now = Date.now();
+    // Create initial empty history with small random values to make bars visible
+    setPriceHistory(
+      Array(TOTAL_BARS)
+        .fill(null)
+        .map((_, i) => ({
+          // Small random values between -0.5 and 0.5 to make bars visible initially
+          priceChangePercent: (Math.random() - 0.5) * 0.5,
+          timestamp: now - (TOTAL_BARS - i) * 1000, // Stagger timestamps
+        }))
+    );
+  }, []);
+
+  // Function to update the custom range
+  const setCustomRange = (range: [number, number]) => {
+    setCurrentRange(range);
+  };
+
+  // Use custom range if provided
+  useEffect(() => {
+    if (customRange) {
+      setCurrentRange(customRange);
+    }
+  }, [customRange]);
+
+  // Function to update data with simulated values (for testing)
+  const updateWithSimulatedData = (simulatedData: {
+    priceChangePercent: number;
+    lastPrice: string;
+    volume: string;
+  }) => {
+    // Update filtered data directly
+    setFilteredData(simulatedData);
+
+    // Update price change percent
+    setPriceChangePercent(simulatedData.priceChangePercent);
+
+    // Update range if needed and not using custom range
+    if (!customRange) {
+      setCurrentRange(getDynamicRange(simulatedData.priceChangePercent));
+    }
+
+    // Add to history
+    const newHistoryItem = {
+      priceChangePercent: simulatedData.priceChangePercent,
+      timestamp: Date.now(),
+    };
+
+    setPriceHistory((currentHistory) => {
+      // Remove oldest item if we're at capacity
+      const updatedHistory = [...currentHistory];
+      if (updatedHistory.length >= TOTAL_BARS) {
+        updatedHistory.shift(); // Remove oldest (first) item
+      }
+      // Add new item at the end
+      updatedHistory.push(newHistoryItem);
+      return updatedHistory;
+    });
+  };
 
   useEffect(() => {
     if (!marketData || !selectedSymbol?.trim()) return;
@@ -53,26 +117,37 @@ export function usePriceOscillator({
       setFilteredData({
         priceChangePercent: newPriceChangePercent,
         lastPrice: matchingItem.lastPrice,
+        volume: matchingItem.volume,
       });
-      setCurrentRange(getDynamicRange(newPriceChangePercent));
 
-      // Update history by shifting values left and adding new value at the end
-      setPriceHistory((prev) => {
-        const newHistory = [
-          ...prev.slice(1),
-          {
-            priceChangePercent: newPriceChangePercent,
-            timestamp: Date.now(),
-          },
-        ];
-        return newHistory;
+      // Only update range if not using custom range
+      if (!customRange) {
+        setCurrentRange(getDynamicRange(newPriceChangePercent));
+      }
+
+      // Add new item to history and limit length
+      const newHistoryItem = {
+        priceChangePercent: newPriceChangePercent,
+        timestamp: Date.now(),
+      };
+
+      setPriceHistory((currentHistory) => {
+        // Remove oldest item if we're at capacity
+        const updatedHistory = [...currentHistory];
+        if (updatedHistory.length >= TOTAL_BARS) {
+          updatedHistory.shift(); // Remove oldest (first) item
+        }
+        // Add new item at the end
+        updatedHistory.push(newHistoryItem);
+        return updatedHistory;
       });
     }
-  }, [marketData, selectedSymbol]);
+  }, [marketData, selectedSymbol, customRange]);
 
   useEffect(() => {
-    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0)
+    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0) {
       return;
+    }
 
     const svg = d3.select(svgRef.current);
 
@@ -194,10 +269,13 @@ export function usePriceOscillator({
       }
     }
 
-    updateBars(svg, yScale, chartWidth, priceHistory);
+    // Only try to update bars if we have price history
+    if (priceHistory.length > 0) {
+      updateBars(svg, yScale, chartWidth, priceHistory);
+    }
   }, [dimensions, priceHistory, currentRange]);
 
-  return { svgRef, filteredData };
+  return { svgRef, filteredData, updateWithSimulatedData, setCustomRange };
 }
 
 function defineGradients(
@@ -216,9 +294,12 @@ function defineGradients(
     },
   ];
 
+  // Remove existing gradients to prevent duplicates
+  svg.select("defs").remove();
+  const defs = svg.append("defs");
+
   gradients.forEach(({ id, color, direction }) => {
-    const gradient = svg
-      .append("defs")
+    const gradient = defs
       .append("linearGradient")
       .attr("id", id)
       .attr("x1", "0%")
@@ -246,85 +327,134 @@ function updateBars(
   chartWidth: number,
   history: PriceHistoryItem[]
 ) {
-  const barWidth = 30; // Thinner bars to fit all 10
-  const barSpacing = 15; // Smaller spacing between bars
+  const barWidth = 30;
+  const barSpacing = 15;
   const totalBarWidth = barWidth + barSpacing;
-  const rightPadding = 1; // Padding from the right edge to match the margin
+  const rightPadding = barSpacing;
+
+  // Calculate start position for the rightmost bar
+  const startX = chartWidth - rightPadding - barWidth;
 
   const chartGroup = svg.select<SVGGElement>(".chart-group");
 
-  // Create a group for all bars if it doesn't exist
+  // Get or create the bars group
   let barsGroup = chartGroup.select<SVGGElement>(".bars-group");
   if (barsGroup.empty()) {
     barsGroup = chartGroup.append<SVGGElement>("g").attr("class", "bars-group");
   }
 
-  // Create bar groups with data binding
-  const bars = barsGroup
+  // Use D3's data binding for proper animations
+  const barGroups = barsGroup
     .selectAll<SVGGElement, PriceHistoryItem>(".bar-group")
-    .data(history, (d: PriceHistoryItem, i: number) => i); // Use index as key to keep bars in place
+    .data(history, (d) => d.timestamp.toString());
 
-  // Remove old bars
-  bars.exit().remove();
+  // ENTER: Create new elements for new data points
+  const enterGroups = barGroups
+    .enter()
+    .append("g")
+    .attr("class", "bar-group")
+    .attr("transform", `translate(${startX + totalBarWidth}, 0)`) // Start off-screen to the right
+    .style("opacity", 0.2);
 
-  // Add new bars
-  const barsEnter = bars.enter().append("g").attr("class", "bar-group");
+  // Add rectangle to each new group
+  enterGroups
+    .append("rect")
+    .attr("class", "price-bar")
+    .attr("width", barWidth)
+    .attr("height", 0) // Start with height 0
+    .attr("y", yScale(0));
 
-  // Add rectangle for each new bar
-  barsEnter.append("rect").attr("class", "price-bar").attr("width", barWidth);
-
-  // Add border line for each new bar
-  barsEnter
+  // Add border line to each new group
+  enterGroups
     .append("line")
     .attr("class", "price-bar-border")
     .attr("stroke", "rgba(255,255,255,0.5)")
-    .attr("stroke-width", 1);
+    .attr("stroke-width", 1)
+    .attr("x1", 0)
+    .attr("x2", barWidth)
+    .attr("y1", yScale(0))
+    .attr("y2", yScale(0));
 
-  // Update all bars (new and existing)
-  const allBars = barsGroup.selectAll<SVGGElement, PriceHistoryItem>(
-    ".bar-group"
-  );
+  // Add value text to each new group (optional)
+  enterGroups
+    .append("text")
+    .attr("class", "debug-text")
+    .attr("x", barWidth / 2)
+    .attr("y", yScale(0) - 5)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "8px")
+    .attr("fill", "white")
+    .attr("opacity", 0.8);
 
-  allBars.each(function (d: PriceHistoryItem, i: number) {
+  // EXIT: Remove elements that no longer have data
+  barGroups
+    .exit()
+    .transition()
+    .duration(800)
+    .ease(d3.easeCubicInOut)
+    .attr("transform", (d, i) => `translate(${-totalBarWidth * 2}, 0)`) // Slide left off screen
+    .style("opacity", 0)
+    .remove();
+
+  // MERGE: Handle updates for both existing and new elements
+  const allBarGroups = barGroups.merge(enterGroups);
+
+  // First animate the position (slide from right for new bars, shift left for existing)
+  allBarGroups
+    .transition()
+    .duration(800)
+    .ease(d3.easeCubicInOut)
+    .style("opacity", (d, i) => {
+      // Calculate opacity based on index - newest bar (rightmost) is fully opaque
+      return 0.2 + (i * 0.8) / Math.max(history.length - 1, 1);
+    })
+    .attr("transform", (d, i) => {
+      const xPos = startX - (history.length - 1 - i) * totalBarWidth;
+      return `translate(${xPos}, 0)`;
+    });
+
+  // Then update all the visual attributes
+  allBarGroups.each(function (d, i) {
     const group = d3.select(this);
-    const bar = group.select(".price-bar");
-    const border = group.select(".price-bar-border");
 
+    // Calculate values for this bar
     const isPositive = d.priceChangePercent >= 0;
     const zeroY = yScale(0);
     const valueY = yScale(d.priceChangePercent);
     const barHeight = Math.abs(zeroY - valueY);
     const barY = isPositive ? valueY : zeroY;
+    const opacity = 0.2 + (i * 0.8) / Math.max(history.length - 1, 1);
 
-    // Calculate opacity based on bar age (index)
-    // Oldest (leftmost) bar has opacity 0.3, newest (rightmost) has opacity 1
-    const opacity = 0.3 + (i * 0.7) / (TOTAL_BARS - 1);
-
-    // Fixed position for each bar index from right to left
-    const barX = chartWidth - rightPadding - (TOTAL_BARS - i) * totalBarWidth;
-
-    // Update bar
-    bar
+    // Update rectangle with animation
+    group
+      .select("rect")
+      .transition()
+      .duration(800)
+      .ease(d3.easeCubicOut)
       .attr("data-value", isPositive ? "positive" : "negative")
       .attr("fill", isPositive ? "url(#cyanGradient)" : "url(#purpleGradient)")
-      .transition()
-      .duration(500)
-      .ease(d3.easeCubicInOut)
-      .attr("x", barX)
       .attr("y", barY)
       .attr("height", barHeight)
       .attr("opacity", opacity);
 
-    // Update border
-    border
+    // Update border line with animation
+    group
+      .select("line")
       .transition()
-      .duration(500)
-      .ease(d3.easeCubicInOut)
-      .attr("x1", barX)
-      .attr("x2", barX + barWidth)
+      .duration(800)
+      .ease(d3.easeCubicOut)
       .attr("y1", valueY)
       .attr("y2", valueY)
       .attr("opacity", opacity);
+
+    // Update debug text with animation
+    group
+      .select("text")
+      .transition()
+      .duration(800)
+      .ease(d3.easeCubicOut)
+      .attr("y", valueY - 5)
+      .text(d.priceChangePercent.toFixed(1));
   });
 }
 
