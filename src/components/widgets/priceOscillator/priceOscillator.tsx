@@ -25,7 +25,6 @@ export function PriceOscillator() {
       customRange: useManualRange ? manualRange : undefined,
     });
 
-  // Function to change the range preset
   const handleRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (value === "auto") {
@@ -37,31 +36,6 @@ export function PriceOscillator() {
       setManualRange([min, max]);
       setCustomRange([min, max]);
     }
-  };
-
-  // Function to simulate data updates for testing animations
-  const simulateDataUpdate = () => {
-    // Create a fake market data update
-    const randomChange = Math.random() * 4 - 2; // Range from -2 to 2
-    const randomPrice = 100 + Math.random() * 10; // Range from 100 to 110
-    const randomVolume = 1000 + Math.random() * 500; // Range from 1000 to 1500
-
-    // Update filter data to trigger chart update
-    const newData = {
-      priceChangePercent: randomChange,
-      lastPrice: randomPrice.toFixed(2),
-      volume: randomVolume.toFixed(2),
-    };
-
-    // Use the update function directly
-    updateWithSimulatedData(newData);
-
-    // Also trigger our component's state updates
-    setPrevPricePercent(currentPricePercent);
-    setCurrentPricePercent(randomChange);
-    setPrevPrice(currentPrice);
-    setCurrentPrice(randomPrice);
-    setTriggerUpdate(Date.now());
   };
 
   useEffect(() => {
