@@ -1,26 +1,16 @@
 import { motion } from "framer-motion";
-import { memo, useMemo } from "react";
 import styles from "./dataDisplay.module.css";
-import { AlignCenter } from "lucide-react";
 
 export type DataDisplayLayoutProps = {
   header: string;
-  data: string;
+  data: {
+    value: string;
+    trend: "up" | "down" | "neutral";
+    key: number;
+  };
 };
 
 function DataDisplayLayout({ header, data }: DataDisplayLayoutProps) {
-  // Process data only when it changes
-  const processedData = useMemo(() => {
-    // Create unique key for animation based on data
-    const matches = data?.match(/key="([^"]+)"/);
-    const key = matches && matches.length > 1 ? matches[1] : undefined;
-
-    // Remove key attribute from the HTML as it's not a valid HTML attribute
-    const cleanData = data?.replace(/key="[^"]+"/g, "") || "";
-
-    return { key, cleanData };
-  }, [data]);
-
   return (
     <motion.div
       initial={{ opacity: 0.9, scale: 0.95 }}
@@ -49,12 +39,18 @@ function DataDisplayLayout({ header, data }: DataDisplayLayoutProps) {
             </motion.span>
           ))}
         </motion.h3>
-        <motion.div
-          key={processedData.key || Math.random()}
-          className={styles.dataDisplayData}
-          dangerouslySetInnerHTML={{ __html: processedData.cleanData }}
+        <motion.span
+          key={data.key}
+          className={`${styles.dataDisplayData} ${styles[data.trend]}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           style={{ textAlign: "center" }}
-        />
+        >
+          {data.value}
+          {data.trend === "up" && <span className={styles.arrowUp}>▲</span>}
+          {data.trend === "down" && <span className={styles.arrowDown}>▼</span>}
+        </motion.span>
       </div>
     </motion.div>
   );
