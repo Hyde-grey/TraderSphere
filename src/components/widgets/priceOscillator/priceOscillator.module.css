@@ -46,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: 150px;
+
   flex-shrink: 0;
 }
 
@@ -104,4 +104,165 @@
 
 :global(.price-bar[data-value="negative"]) {
   filter: drop-shadow(0 0 2px rgba(147, 112, 219, 0.3));
+}
+
+.valueUp {
+  display: inline-block;
+  animation: valueSlideUp 0.4s ease-out forwards;
+  color: rgb(123, 221, 213);
+  text-align: center;
+  width: 100%;
+  opacity: 1;
+  font-size: 1.5rem;
+}
+
+.valueDown {
+  display: inline-block;
+  animation: valueSlideDown 0.4s ease-out forwards;
+  color: rgb(147, 112, 219);
+  text-align: center;
+  width: 100%;
+  opacity: 1;
+  font-size: 1.5rem;
+}
+
+.valueNeutral {
+  display: inline-block;
+  color: white;
+  text-align: center;
+  width: 100%;
+  opacity: 1;
+  font-size: 1.5rem;
+}
+
+.arrowUp {
+  display: inline-block;
+  color: rgb(123, 221, 213);
+  position: relative;
+  animation: arrowUp 0.4s ease-out forwards;
+  margin-left: 4px;
+  opacity: 1;
+}
+
+.arrowDown {
+  display: inline-block;
+  color: rgb(147, 112, 219);
+  position: relative;
+  animation: arrowDown 0.4s ease-out forwards;
+  margin-left: 4px;
+  opacity: 1;
+}
+
+@keyframes valueSlideUp {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes valueSlideDown {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes arrowUp {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes arrowDown {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.updateButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(70, 80, 100, 0.5);
+  border: 1px solid rgba(123, 221, 213, 0.3);
+  border-radius: 4px;
+  color: rgb(123, 221, 213);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.updateButton:hover {
+  background-color: rgba(123, 221, 213, 0.2);
+  border-color: rgb(123, 221, 213);
+  box-shadow: 0 0 8px rgba(123, 221, 213, 0.4);
+}
+
+.updateButton:active {
+  transform: scale(0.97);
+}
+
+.updateButton svg {
+  color: rgb(123, 221, 213);
+  min-width: 16px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rangeSelector {
+  background-color: rgba(70, 80, 100, 0.5);
+  border: 1px solid rgba(123, 221, 213, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  outline: none;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 30px;
+  height: 30px;
+  margin-left: 12px;
+}
+
+.rangeSelector:hover,
+.rangeSelector:focus {
+  border-color: rgb(123, 221, 213);
+  box-shadow: 0 0 8px rgba(123, 221, 213, 0.4);
+}
+
+.rangeSelector option {
+  background-color: rgb(30, 35, 45);
+  color: white;
 }
