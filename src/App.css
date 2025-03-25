@@ -46,7 +46,8 @@ h3 {
   font-size: 1.6rem;
 }
 
-p {
+p,
+a {
   font-size: 1.5rem;
 }
 
