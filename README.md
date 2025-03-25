@@ -153,12 +153,12 @@ yarn build
 
 1. **Monitoring Specific Symbols**
 
-   - Enter a symbol in the search input at the top of the Price Oscillator
+   - Enter a symbol in the search input at the top of the Price Oscillator or click on a symbol's row
    - The chart will update in real-time with price changes
    - The display shows:
-     - Current price change percentage
-     - Last price
-     - Historical price changes (last 10 updates)
+   - Current price change percentage
+   - Last price
+   - Historical price changes (last 10 updates)
 
 2. **Reading the Chart**
    - Green bars indicate positive price changes
