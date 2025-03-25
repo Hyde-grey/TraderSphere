@@ -9,6 +9,7 @@ import FadeInMotion from "../motion/fadeInMotion";
 import PriceOscillator from "../widgets/priceOscillator/priceOscillator";
 
 import { SymbolProvider } from "../../contexts/SymbolContext";
+import NewsWidget from "../widgets/newsWidget/NewsWidget";
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
@@ -38,7 +39,7 @@ const DashboardLayout = () => {
           minW: 6,
           maxH: 18,
         },
-        { i: "recentTrade", x: 0, y: 24, w: 24, h: 8, minH: 6, minW: 6 },
+        { i: "newsFeed", x: 0, y: 24, w: 24, h: 8, minH: 6, minW: 6 },
       ]
     : [
         {
@@ -62,7 +63,7 @@ const DashboardLayout = () => {
           minW: 6,
           maxH: 18,
         },
-        { i: "recentTrade", x: 16, y: 10, w: 8, h: 8, minH: 6, minW: 6 },
+        { i: "newsFeed", x: 16, y: 10, w: 8, h: 8, minH: 6, minW: 6 },
       ];
 
   return (
@@ -126,16 +127,16 @@ const DashboardLayout = () => {
               </div>
             </FadeInMotion>
 
-            <FadeInMotion key="recentTrade" className={styles.hudPanel}>
+            <FadeInMotion key="newsFeed" className={styles.hudPanel}>
               <div className={styles.hudElement}>
                 <div
                   className={`${styles.hudElementContent} dragMe`}
                   style={{ cursor: "move" }}
                 >
-                  <h2>Recent Trades</h2>
+                  <h2>News Feed</h2>
                 </div>
                 <div className={styles.widgetContent}>
-                  <div>Trades content coming soon...</div>
+                  <NewsWidget />
                 </div>
               </div>
             </FadeInMotion>

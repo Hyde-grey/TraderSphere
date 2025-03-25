@@ -93,27 +93,31 @@ export const useFetchNews = (symbol?: string, country: string = "us") => {
  * @returns Expanded search query
  */
 function getExpandedSymbolQuery(symbol: string): string {
+  // Only use the first three letters of the symbol for broader search
+  const shortSymbol = symbol.substring(0, 3).toUpperCase();
+
   // Map of common stock symbols to their company names
   const symbolMap: Record<string, string> = {
-    AAPL: "Apple",
-    MSFT: "Microsoft",
-    GOOGL: "Google",
-    AMZN: "Amazon",
-    META: "Facebook Meta",
-    TSLA: "Tesla",
+    AAP: "Apple",
+    MSF: "Microsoft",
+    GOO: "Google",
+    AMZ: "Amazon",
+    MET: "Facebook Meta",
+    TSL: "Tesla",
     BTC: "Bitcoin",
     ETH: "Ethereum",
     // Add more mappings as needed
   };
 
-  const company = symbolMap[symbol.toUpperCase()] || "";
+  // Check if we have a mapping for the short symbol
+  const company = symbolMap[shortSymbol] || "";
 
   if (company) {
-    // If we have a company name, include both the symbol and company
-    return `${symbol} OR ${company} stock market`;
+    // If we have a company name, include both the short symbol and company
+    return `${shortSymbol} OR ${company} stock market`;
   } else {
-    // Otherwise just use the symbol with stock/crypto context
-    return `${symbol} stock OR ${symbol} trading OR ${symbol} market`;
+    // Otherwise just use the short symbol with stock/crypto context
+    return `${shortSymbol} stock OR ${shortSymbol} trading OR ${shortSymbol} market`;
   }
 }
 
