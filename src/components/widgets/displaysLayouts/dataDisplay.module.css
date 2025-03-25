@@ -2,7 +2,6 @@
   position: relative;
   min-height: 25%;
   aspect-ratio: 1 / 0.6;
-
   margin-left: 10px;
 }
 
@@ -37,4 +36,52 @@
   border-color: transparent transparent rgb(123, 221, 213) transparent;
   pointer-events: none;
   z-index: 1;
+}
+
+.up {
+  color: rgb(123, 221, 213);
+}
+
+.down {
+  color: rgb(147, 112, 219);
+}
+
+.neutral {
+  color: white;
+}
+
+.arrowUp {
+  display: inline-block;
+  margin-left: 4px;
+  animation: slideUp 0.4s ease-out forwards;
+  color: rgb(123, 221, 213);
+}
+
+.arrowDown {
+  display: inline-block;
+  margin-left: 4px;
+  animation: slideDown 0.4s ease-out forwards;
+  color: rgb(147, 112, 219);
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
