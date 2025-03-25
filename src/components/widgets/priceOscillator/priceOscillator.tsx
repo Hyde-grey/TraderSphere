@@ -60,35 +60,29 @@ export function PriceOscillator() {
     }
   }, [filteredData, currentPrice]);
 
-  const formattedtPercentage = useMemo(() => {
-    if (!filteredData) return "0.00 %";
+  const percentageData = useMemo(() => {
+    if (!filteredData)
+      return { value: "0.00 %", trend: "neutral" as const, key: 0 };
 
     const newPriceChangePercent = filteredData.priceChangePercent;
     const isIncreasing = newPriceChangePercent > prevPricePercent;
     const isDecreasing = newPriceChangePercent < prevPricePercent;
     const timestamp = triggerUpdate;
 
-    if (isIncreasing) {
-      return `<span class="${styles.valueUp}" key="${timestamp}">
-        ${newPriceChangePercent.toFixed(2)} % 
-        <span class="${styles.arrowUp}" style="vertical-align: middle;">▲</span>
-      </span>`;
-    } else if (isDecreasing) {
-      return `<span class="${styles.valueDown}" key="${timestamp}">
-        ${newPriceChangePercent.toFixed(2)} % 
-        <span class="${
-          styles.arrowDown
-        }" style="vertical-align: middle;">▼</span>
-      </span>`;
-    } else {
-      return `<span class="${styles.valueNeutral}" key="${timestamp}">
-        ${newPriceChangePercent.toFixed(2)} %
-      </span>`;
-    }
+    return {
+      value: `${newPriceChangePercent.toFixed(2)} %`,
+      trend: isIncreasing
+        ? ("up" as const)
+        : isDecreasing
+        ? ("down" as const)
+        : ("neutral" as const),
+      key: timestamp,
+    };
   }, [filteredData, prevPricePercent, triggerUpdate]);
 
-  const formattedPrice = useMemo(() => {
-    if (!filteredData) return "0.00";
+  const priceData = useMemo(() => {
+    if (!filteredData)
+      return { value: "0.00", trend: "neutral" as const, key: 0 };
 
     const newPrice = Number(filteredData.lastPrice);
     const isIncreasing = newPrice > prevPrice;
@@ -100,34 +94,31 @@ export function PriceOscillator() {
         ? `$ ${filteredData.lastPrice}`
         : `$ ${newPrice.toFixed(2)}`;
 
-    if (isIncreasing) {
-      return `<span class="${styles.valueUp}" key="${timestamp}">
-        ${formattedValue} 
-        <span class="${styles.arrowUp}" style="vertical-align: middle;">▲</span>
-      </span>`;
-    } else if (isDecreasing) {
-      return `<span class="${styles.valueDown}" key="${timestamp}">
-        ${formattedValue} 
-        <span class="${styles.arrowDown}" style="vertical-align: middle;">▼</span>
-      </span>`;
-    } else {
-      return `<span class="${styles.valueNeutral}" key="${timestamp}">
-        ${formattedValue}
-      </span>`;
-    }
+    return {
+      value: formattedValue,
+      trend: isIncreasing
+        ? ("up" as const)
+        : isDecreasing
+        ? ("down" as const)
+        : ("neutral" as const),
+      key: timestamp,
+    };
   }, [filteredData, prevPrice, triggerUpdate]);
 
-  const formattedVolume = useMemo(() => {
-    if (!filteredData) return "0.00";
+  const volumeData = useMemo(() => {
+    if (!filteredData)
+      return { value: "0.00", trend: "neutral" as const, key: 0 };
 
     const volume = Number(filteredData.volume);
     const timestamp = triggerUpdate + 2;
     const formattedValue =
       volume < 0.01 ? filteredData.volume : volume.toFixed(2);
 
-    return `<span class="${styles.valueNeutral}" key="${timestamp}">
-      ${formattedValue}
-    </span>`;
+    return {
+      value: formattedValue,
+      trend: "neutral" as const,
+      key: timestamp,
+    };
   }, [filteredData, triggerUpdate]);
 
   return (
@@ -168,10 +159,10 @@ export function PriceOscillator() {
                 ? selectedSymbol.toUpperCase()
                 : "No Symbol Selected"
             }
-            data={formattedtPercentage}
+            data={percentageData}
           />
-          <DataDisplayLayout header={"PRICE"} data={formattedPrice} />
-          <DataDisplayLayout header={"Volume"} data={formattedVolume} />
+          <DataDisplayLayout header={"PRICE"} data={priceData} />
+          <DataDisplayLayout header={"Volume"} data={volumeData} />
         </div>
       </div>
     </div>
