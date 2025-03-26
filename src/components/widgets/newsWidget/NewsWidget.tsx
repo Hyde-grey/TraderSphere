@@ -60,7 +60,11 @@ export const NewsWidget = () => {
 
       {loading && <div className={styles.loading}>Loading news</div>}
 
-      {error && <div className={styles.error}>Error: {error.message}</div>}
+      {error && (
+        <div className={styles.error}>
+          API call limit reached. Please try again later.
+        </div>
+      )}
 
       {!loading &&
         !error &&
