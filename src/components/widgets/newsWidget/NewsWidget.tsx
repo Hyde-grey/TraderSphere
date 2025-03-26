@@ -36,7 +36,7 @@ export const NewsWidget = () => {
     <div className={styles.newsWidget}>
       <div className={styles.header}>
         <h2>
-          <LiveIndicator isConnected={true} />
+          <span>Market News</span>
         </h2>
         <form onSubmit={handleSearch} className={styles.searchForm}>
           <input
@@ -89,17 +89,17 @@ export const NewsWidget = () => {
                 </span>
               </h3>
               <span className={styles.articleCount}>
-                {news.totalResults} articles found
+                {news.totalArticles} articles found
               </span>
             </div>
 
             <div className={styles.newsList}>
               {news.articles.map((article, index) => (
                 <div key={index} className={styles.newsItem}>
-                  {article.urlToImage && (
+                  {article.image && (
                     <div className={styles.imageContainer}>
                       <img
-                        src={article.urlToImage}
+                        src={article.image}
                         alt={article.title}
                         className={styles.thumbnail}
                       />
