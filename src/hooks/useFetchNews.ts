@@ -1,36 +1,33 @@
 import { useState, useEffect } from "react";
 
-// Define TypeScript types for the news API response
+// Define TypeScript types for the Gnews API response
 type NewsSource = {
-  id: string | null;
   name: string;
+  url: string;
 };
 
 type NewsArticle = {
-  source: NewsSource;
-  author: string | null;
   title: string;
-  description: string | null;
+  description: string;
+  content: string;
   url: string;
-  urlToImage: string | null;
+  image: string | null;
   publishedAt: string;
-  content: string | null;
+  source: NewsSource;
 };
 
-type NewsApiResponse = {
-  status: string;
-  totalResults: number;
+type GnewsApiResponse = {
+  totalArticles: number;
   articles: NewsArticle[];
 };
 
 /**
- * Custom hook for fetching news articles from NewsAPI related to trading symbols
+ * Custom hook for fetching news articles from Gnews API related to trading symbols
  * @param {string} symbol - Trading symbol (e.g., "AAPL", "BTC")
- * @param {string} country - Country code (default: 'us')
  * @returns {Object} - News data, loading state, and error state
  */
-export const useFetchNews = (symbol?: string, country: string = "us") => {
-  const [news, setNews] = useState<NewsApiResponse | null>(null);
+export const useFetchNews = (symbol?: string) => {
+  const [news, setNews] = useState<GnewsApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -48,28 +45,24 @@ export const useFetchNews = (symbol?: string, country: string = "us") => {
 
       try {
         // Build the URL with parameters
-        const API_KEY = "66c5b5192aaa4e38b781530a7dbcb196";
-        // For symbols, it's better to use the everything endpoint with the symbol as a query
-        let url = `https://newsapi.org/v2/everything?apiKey=${API_KEY}`;
-
-        // Add the symbol as a search query
-        // Add company name or additional context if available (like "AAPL" + "Apple")
+        const API_KEY = "0eb517de1bf12d5c4199b532a0306d60"; // Replace with your Gnews API key
         const searchQuery = getExpandedSymbolQuery(symbol);
-        url += `&q=${encodeURIComponent(searchQuery)}`;
 
-        // Add additional parameters for better results
-        url += `&language=en`;
-        url += `&sortBy=publishedAt`; // Get the most recent news
-        url += `&pageSize=10`; // Limit to 10 articles
+        // Gnews API endpoint
+        const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
+          searchQuery
+        )}&apikey=${API_KEY}&lang=en&country=us&max=10`;
 
         const response = await fetch(url);
 
         // Check if the request was successful
         if (!response.ok) {
-          throw new Error(`News API responded with status: ${response.status}`);
+          throw new Error(
+            `Gnews API responded with status: ${response.status}`
+          );
         }
 
-        const data: NewsApiResponse = await response.json();
+        const data: GnewsApiResponse = await response.json();
         setNews(data);
       } catch (err) {
         setError(
@@ -82,7 +75,7 @@ export const useFetchNews = (symbol?: string, country: string = "us") => {
     };
 
     fetchNews();
-  }, [symbol, country]); // Re-fetch when these dependencies change
+  }, [symbol]); // Re-fetch when symbol changes
 
   return { news, loading, error };
 };
