@@ -1,5 +1,5 @@
 [build]
-  command = "yarn install --frozen-lockfile && yarn add @types/d3 @types/node @tanstack/react-table @tanstack/react-virtual --dev && yarn build"
+  command = "yarn install --frozen-lockfile && yarn add @types/d3 @types/node @tanstack/react-table @tanstack/react-virtual react-grid-layout react-resizable --dev && yarn build"
   publish = "dist"
 
 [build.environment]

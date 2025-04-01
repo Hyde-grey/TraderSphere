@@ -28,6 +28,8 @@
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-grid-layout": "^1.4.0",
+    "react-resizable": "^3.0.5",
     "react-router-dom": "^6.25.2",
     "recharts": "^2.13.0",
     "tailwind-merge": "^2.3.0",
