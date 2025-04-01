@@ -7,6 +7,7 @@ import MarketSummaryTable from "../widgets/marketSummaryTable/marketSummaryTable
 import { useScreenSize } from "../hooks/useScreenSize";
 import FadeInMotion from "../motion/fadeInMotion";
 import PriceOscillator from "../widgets/priceOscillator/priceOscillator";
+import CandleStickChart from "../widgets/candlestickChart/candleStickChart";
 
 import { SymbolProvider } from "../../contexts/SymbolContext";
 import NewsWidget from "../widgets/newsWidget/NewsWidget";
@@ -122,7 +123,7 @@ const DashboardLayout = () => {
                   <h2>Candlestick Chart</h2>
                 </div>
                 <div className={styles.widgetContent}>
-                  <div>Chart content coming soon...</div>
+                  <CandleStickChart />
                 </div>
               </div>
             </FadeInMotion>

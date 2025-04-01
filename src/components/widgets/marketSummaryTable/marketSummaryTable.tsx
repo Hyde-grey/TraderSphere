@@ -69,8 +69,8 @@ const MarketSummaryTable = () => {
 
   return (
     <div className={styles.tableContainer}>
+      <LiveIndicator isConnected />
       <div className={styles.tableSearch}>
-        <LiveIndicator isConnected />
         <input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
