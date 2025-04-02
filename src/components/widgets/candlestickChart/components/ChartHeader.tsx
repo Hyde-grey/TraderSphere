@@ -19,12 +19,15 @@ const ChartHeader = ({
 }: ChartHeaderProps) => {
   return (
     <div className={styles.chartHeader}>
-      <span>{symbol} - Hourly Chart</span>
+      <div className={styles.chartHeaderTitle}>
+        <span className={styles.symbolText}>{symbol}</span>
+        <span className={styles.chartType}>Hourly Chart</span>
+      </div>
       <div className={styles.liveStatusContainer}>
         {isLive && <LiveIndicator isConnected={isConnected} />}
         {lastUpdated && (
           <span className={styles.lastUpdated}>
-            Last update: {lastUpdated.toLocaleTimeString()}
+            Last: {lastUpdated.toLocaleTimeString()}
           </span>
         )}
       </div>
