@@ -8,6 +8,7 @@ import { useScreenSize } from "../hooks/useScreenSize";
 import FadeInMotion from "../motion/fadeInMotion";
 import PriceOscillator from "../widgets/priceOscillator/priceOscillator";
 import CandleStickChart from "../widgets/candlestickChart/candleStickChart";
+import { useSaveLayout } from "../hooks/useSaveLayout";
 
 import { SymbolProvider } from "../../contexts/SymbolContext";
 import NewsWidget from "../widgets/newsWidget/NewsWidget";
@@ -16,56 +17,7 @@ const ResponsiveGridLayout = WidthProvider(GridLayout);
 
 const DashboardLayout = () => {
   const { isMobile } = useScreenSize();
-
-  const layout = isMobile
-    ? [
-        {
-          i: "marketOverview",
-          x: 0,
-          y: 0,
-          w: 24,
-          h: 10,
-          minH: 8,
-          minW: 8,
-          maxH: 18,
-        },
-        { i: "ocsillator", x: 0, y: 0, w: 24, h: 10, minH: 6, minW: 6 },
-        {
-          i: "candlestick",
-          x: 0,
-          y: 12,
-          w: 24,
-          h: 10,
-          minH: 6,
-          minW: 6,
-          maxH: 18,
-        },
-        { i: "newsFeed", x: 0, y: 24, w: 24, h: 8, minH: 6, minW: 6 },
-      ]
-    : [
-        {
-          i: "marketOverview",
-          x: 0,
-          y: 0,
-          w: 14,
-          h: 10,
-          minH: 6,
-          minW: 6,
-          maxH: 18,
-        },
-        { i: "ocsillator", x: 14, y: 0, w: 10, h: 10, minH: 6, minW: 6 },
-        {
-          i: "candlestick",
-          x: 0,
-          y: 10,
-          w: 16,
-          h: 8,
-          minH: 6,
-          minW: 6,
-          maxH: 18,
-        },
-        { i: "newsFeed", x: 16, y: 10, w: 8, h: 8, minH: 6, minW: 6 },
-      ];
+  const { layout, saveLayout, resetLayout } = useSaveLayout();
 
   return (
     <SymbolProvider>
@@ -85,6 +37,7 @@ const DashboardLayout = () => {
             bounds={{ top: 0, right: 0, bottom: 0, left: 0 }}
             draggableHandle=".dragMe"
             useCSSTransforms={true}
+            onLayoutChange={saveLayout}
           >
             <FadeInMotion key="marketOverview" className={styles.hudPanel}>
               <div className={styles.hudElement}>
